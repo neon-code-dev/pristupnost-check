@@ -251,13 +251,16 @@ export async function scanUrl(inputUrl: string): Promise<ScanResult> {
     });
 
     // Capture screenshots of violating elements while browser is open
-    const screenshots = await captureScreenshots(page, results.violations);
+    const incompleteFiltered = results.incomplete
+      .filter((r) => r.nodes.length > 0)
+      .slice(0, 10);
+    const screenshots = await captureScreenshots(
+      page,
+      [...results.violations, ...incompleteFiltered],
+    );
 
     const violations = results.violations.map((v) => mapViolation(v, screenshots));
-    const incomplete = results.incomplete
-      .filter((r) => r.nodes.length > 0)
-      .slice(0, 10)
-      .map((v) => mapViolation(v, screenshots));
+    const incomplete = incompleteFiltered.map((v) => mapViolation(v, screenshots));
 
     return {
       url,
