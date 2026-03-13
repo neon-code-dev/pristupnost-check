@@ -86,10 +86,8 @@ function mapViolation(
 }
 
 const SCREENSHOT_QUALITY = 55;
-const VIEWPORT_W = 1366;
-const VIEWPORT_H = 768;
 
-/** Capture one screenshot per node selector. Returns map: selector → data:image/jpeg;base64,... */
+/** Capture one screenshot per node selector using element.screenshot() for reliability. */
 async function captureScreenshots(
   page: Awaited<ReturnType<Awaited<ReturnType<typeof puppeteer.launch>>["newPage"]>>,
   violations: AxeRuleResult[],
@@ -114,64 +112,44 @@ async function captureScreenshots(
       const el = await page.$(selector);
       if (!el) continue;
 
-      // Scroll element to center of viewport
-      await page.evaluate((s: string) => {
-        document.querySelector(s)?.scrollIntoView({ block: "center", inline: "center" });
-      }, selector);
-      await new Promise((r) => setTimeout(r, 100));
+      const box = await el.boundingBox();
+      if (!box || box.width < 1 || box.height < 1) continue;
 
-      // Add visible highlight: red outline + semi-transparent red background tint
-      await page.evaluate((s: string) => {
-        const e = document.querySelector(s) as HTMLElement | null;
-        if (e) {
-          e.style.setProperty("outline", "4px solid #dc2626", "important");
-          e.style.setProperty("outline-offset", "3px", "important");
-          e.style.setProperty("background-color", "rgba(220,38,38,0.12)", "important");
-        }
-      }, selector);
+      // For tiny elements (small text), temporarily add padding so screenshot isn't 1px tall
+      const needsPadding = box.height < 30 || box.width < 50;
+      if (needsPadding) {
+        await page.evaluate((s: string) => {
+          const e = document.querySelector(s) as HTMLElement | null;
+          if (e) {
+            e.dataset.origPadding = e.style.padding;
+            e.style.setProperty("padding", "12px 16px", "important");
+          }
+        }, selector);
+      }
 
       try {
-        const box = await el.boundingBox();
-        if (!box || box.width < 1 || box.height < 1) continue;
-
-        // Adaptive padding: small for small elements, bigger for large
-        // Ensures the element text is visible, not drowned in background
-        const pad = Math.min(30, Math.max(10, Math.min(box.width, box.height) * 0.3));
-
-        // Clip: element + adaptive padding, capped at reasonable max
-        const w = Math.min(box.width + pad * 2, 700);
-        const h = Math.min(box.height + pad * 2, 350);
-        const cx = box.x + box.width / 2;
-        const cy = box.y + box.height / 2;
-        const clipX = Math.max(0, cx - w / 2);
-        const clipY = Math.max(0, cy - h / 2);
-
-        const clip = {
-          x: clipX,
-          y: clipY,
-          width: Math.min(w, VIEWPORT_W - clipX),
-          height: Math.min(h, VIEWPORT_H - clipY),
-        };
-        if (clip.width < 10 || clip.height < 10) continue;
-
-        const buf = await page.screenshot({
+        // element.screenshot() handles scrolling + captures exactly the element
+        const buf = await el.screenshot({
           encoding: "base64",
           type: "jpeg",
           quality: SCREENSHOT_QUALITY,
-          clip,
         });
 
         shots.set(selector, `data:image/jpeg;base64,${buf}`);
       } finally {
-        // Always remove highlight to avoid leaking into subsequent screenshots
-        await page.evaluate((s: string) => {
-          const e = document.querySelector(s) as HTMLElement | null;
-          if (e) {
-            e.style.removeProperty("outline");
-            e.style.removeProperty("outline-offset");
-            e.style.removeProperty("background-color");
-          }
-        }, selector).catch(() => {});
+        if (needsPadding) {
+          await page.evaluate((s: string) => {
+            const e = document.querySelector(s) as HTMLElement | null;
+            if (e) {
+              if (e.dataset.origPadding) {
+                e.style.padding = e.dataset.origPadding;
+              } else {
+                e.style.removeProperty("padding");
+              }
+              delete e.dataset.origPadding;
+            }
+          }, selector).catch(() => {});
+        }
       }
     } catch {
       // Skip elements that can't be captured
