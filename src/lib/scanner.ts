@@ -14,6 +14,7 @@ export interface ScanIssue {
     html: string;
     target: string;
     failureSummary: string;
+    screenshot?: string;
   }[];
 }
 
@@ -62,7 +63,10 @@ function normalizeUrl(input: string): string {
   return url;
 }
 
-function mapViolation(result: AxeRuleResult): ScanIssue {
+function mapViolation(
+  result: AxeRuleResult,
+  screenshots: Map<string, string>,
+): ScanIssue {
   const translation = getCzechTranslation(result.id, result.help, result.description);
 
   return {
@@ -76,8 +80,102 @@ function mapViolation(result: AxeRuleResult): ScanIssue {
       html: node.html.length > 300 ? node.html.slice(0, 300) + "…" : node.html,
       target: node.target.join(", "),
       failureSummary: node.failureSummary || "",
+      screenshot: screenshots.get(node.target[0]) || undefined,
     })),
   };
+}
+
+const SCREENSHOT_MAX_TOTAL = 15;
+const SCREENSHOT_MAX_PER_RULE = 3;
+const SCREENSHOT_CLIP_W = 500;
+const SCREENSHOT_CLIP_H = 250;
+const SCREENSHOT_QUALITY = 40;
+const VIEWPORT_W = 1366;
+const VIEWPORT_H = 768;
+
+async function captureScreenshots(
+  page: Awaited<ReturnType<Awaited<ReturnType<typeof puppeteer.launch>>["newPage"]>>,
+  violations: AxeRuleResult[],
+): Promise<Map<string, string>> {
+  const shots = new Map<string, string>();
+  let total = 0;
+
+  for (const violation of violations) {
+    if (total >= SCREENSHOT_MAX_TOTAL) break;
+    let perRule = 0;
+
+    for (const node of violation.nodes) {
+      if (total >= SCREENSHOT_MAX_TOTAL || perRule >= SCREENSHOT_MAX_PER_RULE) break;
+      const selector = node.target[0];
+      if (!selector || shots.has(selector)) continue;
+
+      try {
+        const el = await page.$(selector);
+        if (!el) continue;
+
+        // Scroll element to center of viewport
+        await page.evaluate((s: string) => {
+          document.querySelector(s)?.scrollIntoView({ block: "center", inline: "center" });
+        }, selector);
+        await new Promise((r) => setTimeout(r, 100));
+
+        // Add red outline highlight
+        await page.evaluate((s: string) => {
+          const e = document.querySelector(s) as HTMLElement | null;
+          if (e) {
+            e.style.setProperty("outline", "3px solid #ef4444", "important");
+            e.style.setProperty("outline-offset", "2px", "important");
+          }
+        }, selector);
+
+        try {
+          const box = await el.boundingBox();
+          if (!box || box.width < 1 || box.height < 1) continue;
+
+          // Calculate clip region centered on element with padding
+          const pad = 40;
+          const w = Math.min(box.width + pad * 2, SCREENSHOT_CLIP_W);
+          const h = Math.min(box.height + pad * 2, SCREENSHOT_CLIP_H);
+          const cx = box.x + box.width / 2;
+          const cy = box.y + box.height / 2;
+          const clipX = Math.max(0, cx - w / 2);
+          const clipY = Math.max(0, cy - h / 2);
+
+          const clip = {
+            x: clipX,
+            y: clipY,
+            width: Math.min(w, VIEWPORT_W - clipX),
+            height: Math.min(h, VIEWPORT_H - clipY),
+          };
+          if (clip.width < 10 || clip.height < 10) continue;
+
+          const buf = await page.screenshot({
+            encoding: "base64",
+            type: "jpeg",
+            quality: SCREENSHOT_QUALITY,
+            clip,
+          });
+
+          shots.set(selector, `data:image/jpeg;base64,${buf}`);
+          total++;
+          perRule++;
+        } finally {
+          // Always remove outline to avoid leaking into subsequent screenshots
+          await page.evaluate((s: string) => {
+            const e = document.querySelector(s) as HTMLElement | null;
+            if (e) {
+              e.style.removeProperty("outline");
+              e.style.removeProperty("outline-offset");
+            }
+          }, selector).catch(() => {});
+        }
+      } catch {
+        // Skip elements that can't be captured
+      }
+    }
+  }
+
+  return shots;
 }
 
 function calculateScore(passes: number, violations: number): number {
@@ -151,11 +249,14 @@ export async function scanUrl(inputUrl: string): Promise<ScanResult> {
       });
     });
 
-    const violations = results.violations.map(mapViolation);
+    // Capture screenshots of violating elements while browser is open
+    const screenshots = await captureScreenshots(page, results.violations);
+
+    const violations = results.violations.map((v) => mapViolation(v, screenshots));
     const incomplete = results.incomplete
       .filter((r) => r.nodes.length > 0)
       .slice(0, 10)
-      .map(mapViolation);
+      .map((v) => mapViolation(v, screenshots));
 
     return {
       url,

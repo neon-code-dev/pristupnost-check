@@ -79,12 +79,24 @@ function describeElement(html: string): { type: string; text: string; icon: stri
   return { type: typeName, text: text || tag, icon };
 }
 
-function NodeItem({ node, index }: { node: { html: string; target: string; failureSummary: string }; index: number }) {
+function NodeItem({ node }: { node: { html: string; target: string; failureSummary: string; screenshot?: string }; index: number }) {
   const [showCode, setShowCode] = useState(false);
   const { type, text, icon } = describeElement(node.html);
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+      {/* Screenshot preview */}
+      {node.screenshot && (
+        <div className="bg-slate-50 border-b border-slate-200 p-2">
+          <img
+            src={node.screenshot}
+            alt={`${type}: ${text}`}
+            className="rounded border border-slate-200 w-full max-h-48 object-contain"
+            loading="lazy"
+          />
+        </div>
+      )}
+
       {/* Human-readable summary */}
       <div className="p-3 flex items-start gap-3">
         <span className="text-lg shrink-0 mt-0.5" aria-hidden="true">{icon}</span>
