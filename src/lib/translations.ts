@@ -254,6 +254,167 @@ const translations: Record<string, RuleTranslation> = {
     fix: "Přidejte textový přepis audio obsahu.",
   },
 
+  // Color contrast
+  "color-contrast": {
+    title: "Nedostatečný barevný kontrast textu",
+    description:
+      "Barva textu nemá dostatečný kontrast vůči pozadí. Uživatelé se slabým zrakem text špatně přečtou. WCAG 2.1 AA vyžaduje poměr minimálně 4.5:1 pro běžný text a 3:1 pro velký text.",
+    fix: "Zvyšte kontrast — buď ztmavěte text, nebo zesvětlete pozadí. Použijte nástroj jako WebAIM Contrast Checker.",
+  },
+  "color-contrast-enhanced": {
+    title: "Barevný kontrast nesplňuje vyšší úroveň AAA",
+    description:
+      "Text nesplňuje přísnější požadavky WCAG AAA na kontrastní poměr (7:1 pro běžný text).",
+    fix: "Zvyšte kontrast na poměr minimálně 7:1 pro běžný text.",
+  },
+
+  // Target size (WCAG 2.2)
+  "target-size": {
+    title: "Klikací cíl je příliš malý",
+    description:
+      "Interaktivní prvek (odkaz, tlačítko) má menší klikací plochu než 24×24 pixelů. Uživatelé s motorickým postižením nebo na mobilech ho těžko trefí.",
+    fix: "Zvětšete klikací plochu na minimálně 24×24 px pomocí paddingu nebo min-width/min-height.",
+  },
+
+  // Focus
+  "focus-order-semantics": {
+    title: "Element v pořadí fokusu nemá interaktivní roli",
+    description:
+      "Element, který přijímá fokus klávesnicí, by měl mít interaktivní roli (odkaz, tlačítko apod.).",
+    fix: "Přidejte odpovídající roli, nebo odstraňte tabindex pokud element nemá být interaktivní.",
+  },
+
+  // Autocomplete
+  "autocomplete-valid": {
+    title: "Neplatná hodnota atributu autocomplete",
+    description:
+      "Atribut autocomplete musí mít správnou hodnotu odpovídající typu pole (např. name, email, tel).",
+    fix: "Opravte hodnotu autocomplete na platnou — např. autocomplete=\"email\" pro emailové pole.",
+  },
+
+  // Duplicate ID
+  "duplicate-id-aria": {
+    title: "Duplicitní ID odkazované z ARIA",
+    description:
+      "Více elementů má stejné ID, na které odkazuje ARIA atribut (aria-labelledby, aria-describedby). Čtečka pak přečte špatný text.",
+    fix: "Opravte duplicitní ID tak, aby bylo unikátní.",
+  },
+
+  // Nested interactive
+  "nested-interactive": {
+    title: "Vnořené interaktivní prvky",
+    description:
+      "Interaktivní prvek (tlačítko, odkaz) je uvnitř jiného interaktivního prvku. To je matoucí pro klávesnici i čtečky.",
+    fix: "Oddělte vnořené prvky — odkaz nesmí být uvnitř tlačítka a naopak.",
+  },
+
+  // Scrollable region
+  "scrollable-region-focusable": {
+    title: "Scrollovatelná oblast není přístupná klávesnicí",
+    description:
+      "Oblast s posuvníkem musí být ovladatelná klávesnicí, jinak se uživatel bez myši k obsahu nedostane.",
+    fix: "Přidejte tabindex=\"0\" a role=\"region\" s aria-label na scrollovatelný kontejner.",
+  },
+
+  // Landmarks
+  "landmark-banner-is-top-level": {
+    title: "Banner (header) není na nejvyšší úrovni",
+    description: "Element s rolí banner musí být přímý potomek body, ne vnořený v jiném landmarku.",
+    fix: "Přesuňte <header> na nejvyšší úroveň stránky.",
+  },
+  "landmark-contentinfo-is-top-level": {
+    title: "Contentinfo (footer) není na nejvyšší úrovni",
+    description: "Element s rolí contentinfo musí být přímý potomek body.",
+    fix: "Přesuňte <footer> na nejvyšší úroveň stránky.",
+  },
+  "landmark-main-is-top-level": {
+    title: "Main není na nejvyšší úrovni",
+    description: "Element <main> musí být přímý potomek body, ne vnořený v jiném landmarku.",
+    fix: "Přesuňte <main> na nejvyšší úroveň stránky.",
+  },
+  "landmark-no-duplicate-banner": {
+    title: "Stránka má více bannerů (header)",
+    description: "Na stránce by měl být jen jeden element s rolí banner.",
+    fix: "Ponechte jen jeden <header> s rolí banner.",
+  },
+  "landmark-no-duplicate-contentinfo": {
+    title: "Stránka má více patičkových oblastí",
+    description: "Na stránce by měl být jen jeden element s rolí contentinfo.",
+    fix: "Ponechte jen jeden <footer> s rolí contentinfo.",
+  },
+  "landmark-no-duplicate-main": {
+    title: "Stránka má více elementů <main>",
+    description: "Na stránce musí být jen jeden element <main>.",
+    fix: "Ponechte jen jeden <main> element.",
+  },
+  "landmark-unique": {
+    title: "Landmark oblasti nejsou unikátní",
+    description:
+      "Pokud stránka má více landmarků stejného typu (např. dva <nav>), musí mít unikátní aria-label.",
+    fix: "Přidejte aria-label k duplicitním landmarkům, např. aria-label=\"Hlavní navigace\".",
+  },
+
+  // Forms additional
+  "form-field-multiple-labels": {
+    title: "Formulářové pole má více popisků",
+    description: "Pole má přiřazeno více <label> elementů, což je matoucí pro čtečky.",
+    fix: "Ponechte jen jeden <label> pro každé pole.",
+  },
+  "label-content-name-mismatch": {
+    title: "Viditelný text nesouhlasí s přístupným názvem",
+    description:
+      "Text viditelný na obrazovce se liší od přístupného názvu (aria-label). Uživatelé hlasového ovládání pak prvek nenajdou.",
+    fix: "Sjednoťte aria-label s viditelným textem, nebo aria-label úplně odstraňte.",
+  },
+
+  // Objects & Embeds
+  "object-alt": {
+    title: "Element <object> nemá alternativní text",
+    description: "Vložený objekt musí mít přístupný název pro čtečky obrazovky.",
+    fix: "Přidejte aria-label nebo textový obsah dovnitř <object> elementu.",
+  },
+  "area-alt": {
+    title: "Element <area> v image map nemá alt text",
+    description: "Klikací oblasti v obrázkové mapě musí mít atribut alt.",
+    fix: "Přidejte atribut alt popisující, kam odkaz vede.",
+  },
+
+  // Iframe
+  "frame-focusable-content": {
+    title: "Iframe s focusovatelným obsahem nemá přístupný název",
+    description: "Iframe, který obsahuje interaktivní prvky, musí mít atribut title.",
+    fix: "Přidejte atribut title na element <iframe>.",
+  },
+  "frame-title-unique": {
+    title: "Iframe nemá unikátní titulek",
+    description: "Pokud stránka obsahuje více iframe, každý musí mít odlišný title.",
+    fix: "Upravte titulky iframe tak, aby se navzájem lišily.",
+  },
+
+  // Orientation & responsivity
+  "css-orientation-lock": {
+    title: "Obsah je uzamčen na jednu orientaci",
+    description:
+      "Stránka nesmí vynutit orientaci displeje (portrait/landscape). Uživatel na vozíku může mít tablet připevněný na pevno.",
+    fix: "Odstraňte CSS pravidla, která vynucují orientaci přes @media (orientation).",
+  },
+
+  // Autoplay
+  "no-autoplay-audio": {
+    title: "Audio se přehrává automaticky",
+    description:
+      "Automaticky přehrávané audio delší než 3 sekundy musí jít pozastavit nebo ztlumit.",
+    fix: "Přidejte ovládací prvky pro pozastavení/ztlumení, nebo odstraňte autoplay.",
+  },
+
+  // Typography & semantic
+  "p-as-heading": {
+    title: "Tučný odstavec použitý místo nadpisu",
+    description:
+      "Text vypadá jako nadpis (velký/tučný), ale je označený jako odstavec <p>. Čtečky ho nerozpoznají jako nadpis.",
+    fix: "Použijte správný nadpisový element (<h2>, <h3>...) místo tučného odstavce.",
+  },
+
   // Other common
   "meta-viewport": {
     title: "Meta viewport zakazuje zvětšení stránky",

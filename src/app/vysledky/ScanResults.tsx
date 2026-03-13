@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { ScanResult, ScanIssue } from "@/lib/scanner";
 import { getImpactLabel } from "@/lib/translations";
-import { posthog } from "@/lib/posthog";
 import ScoreCircle from "@/components/ScoreCircle";
 import ViolationCard from "@/components/ViolationCard";
 import LoadingState from "@/components/LoadingState";
@@ -53,12 +52,6 @@ export default function ScanResults() {
     const controller = new AbortController();
 
     async function runScan() {
-      // Track scan started
-      posthog.capture("scan_started", {
-        scanned_url: url,
-        source: "results_page",
-      });
-
       try {
         const res = await fetch("/api/scan", {
           method: "POST",
@@ -70,10 +63,6 @@ export default function ScanResults() {
         const contentType = res.headers.get("content-type") || "";
         if (!contentType.includes("application/json")) {
           setError(`Server vrátil chybu ${res.status}. Zkuste to znovu.`);
-          posthog.capture("scan_error", {
-            scanned_url: url,
-            error: `non-json-response-${res.status}`,
-          });
           return;
         }
 
@@ -81,34 +70,13 @@ export default function ScanResults() {
 
         if (!res.ok) {
           setError(data.error || `Chyba ${res.status}`);
-          posthog.capture("scan_error", {
-            scanned_url: url,
-            error: data.error || `HTTP ${res.status}`,
-          });
           return;
         }
 
         setResult(data);
-
-        // Track scan completed with key metrics
-        posthog.capture("scan_completed", {
-          scanned_url: data.url,
-          score: data.score,
-          violations_count: data.violations.length,
-          passes_count: data.passes,
-          total_checks: data.totalChecks,
-          scan_time_ms: data.scanTimeMs,
-          critical_count: data.violations.filter((v: ScanIssue) => v.impact === "critical").length,
-          serious_count: data.violations.filter((v: ScanIssue) => v.impact === "serious").length,
-          top_issues: data.violations.slice(0, 5).map((v: ScanIssue) => v.id),
-        });
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
           setError("Nepodařilo se připojit k serveru. Zkuste to znovu.");
-          posthog.capture("scan_error", {
-            scanned_url: url,
-            error: "connection_failed",
-          });
         }
       } finally {
         setLoading(false);

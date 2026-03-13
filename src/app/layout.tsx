@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import PostHogProvider from "@/components/PostHogProvider";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -50,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="cs">
       <head>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✓</text></svg>" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -74,11 +73,8 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen">
-        <Suspense fallback={null}>
-          <PostHogProvider>
-            {children}
-          </PostHogProvider>
-        </Suspense>
+        {children}
+        <Analytics />
       </body>
     </html>
   );
