@@ -85,11 +85,12 @@ function mapViolation(
   };
 }
 
-const SCREENSHOT_MAX_TOTAL = 15;
-const SCREENSHOT_MAX_PER_RULE = 3;
-const SCREENSHOT_CLIP_W = 500;
-const SCREENSHOT_CLIP_H = 250;
-const SCREENSHOT_QUALITY = 40;
+const SCREENSHOT_MAX_TOTAL = 10;
+const SCREENSHOT_MAX_PER_RULE = 2;
+const SCREENSHOT_CLIP_W = 800;
+const SCREENSHOT_CLIP_H = 400;
+const SCREENSHOT_QUALITY = 55;
+const SCREENSHOT_PAD = 80;
 const VIEWPORT_W = 1366;
 const VIEWPORT_H = 768;
 
@@ -132,8 +133,8 @@ async function captureScreenshots(
           const box = await el.boundingBox();
           if (!box || box.width < 1 || box.height < 1) continue;
 
-          // Calculate clip region centered on element with padding
-          const pad = 40;
+          // Calculate clip region centered on element with generous context
+          const pad = SCREENSHOT_PAD;
           const w = Math.min(box.width + pad * 2, SCREENSHOT_CLIP_W);
           const h = Math.min(box.height + pad * 2, SCREENSHOT_CLIP_H);
           const cx = box.x + box.width / 2;

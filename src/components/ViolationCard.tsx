@@ -4,135 +4,15 @@ import { useState } from "react";
 import { getImpactLabel, getImpactColor } from "@/lib/translations";
 import type { ScanIssue } from "@/lib/scanner";
 
-/** Extract visible text content from an HTML snippet */
-function extractText(html: string): string {
-  // Remove HTML tags
-  const text = html
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  if (text.length > 80) return text.slice(0, 77) + "…";
-  return text;
-}
-
-/** Detect element type from HTML tag and return Czech label */
-function describeElement(html: string): { type: string; text: string; icon: string } {
-  const tagMatch = html.match(/^<(\w+)/);
-  const tag = tagMatch ? tagMatch[1].toLowerCase() : "";
-  const text = extractText(html);
-
-  const typeMap: Record<string, [string, string]> = {
-    button: ["Tlačítko", "🔘"],
-    a: ["Odkaz", "🔗"],
-    input: ["Vstupní pole", "📝"],
-    select: ["Rozbalovací menu", "📋"],
-    textarea: ["Textové pole", "📝"],
-    img: ["Obrázek", "🖼️"],
-    svg: ["Ikona/grafika", "🎨"],
-    h1: ["Nadpis H1", "📌"],
-    h2: ["Nadpis H2", "📌"],
-    h3: ["Nadpis H3", "📌"],
-    h4: ["Nadpis H4", "📌"],
-    h5: ["Nadpis H5", "📌"],
-    h6: ["Nadpis H6", "📌"],
-    iframe: ["Vložený obsah", "📦"],
-    video: ["Video", "🎬"],
-    audio: ["Zvuk", "🔊"],
-    form: ["Formulář", "📋"],
-    nav: ["Navigace", "🧭"],
-    header: ["Záhlaví", "📄"],
-    footer: ["Patička", "📄"],
-    main: ["Hlavní obsah", "📄"],
-    table: ["Tabulka", "📊"],
-    label: ["Popisek pole", "🏷️"],
-    span: ["Text", "💬"],
-    p: ["Odstavec", "💬"],
-    div: ["Sekce", "📦"],
-    li: ["Položka seznamu", "📝"],
-    ul: ["Seznam", "📝"],
-    ol: ["Číslovaný seznam", "📝"],
-    html: ["Stránka", "🌐"],
-  };
-
-  const [typeName, icon] = typeMap[tag] || ["Prvek", "📄"];
-
-  // Special handling for img (show alt or src)
-  if (tag === "img") {
-    const altMatch = html.match(/alt=["']([^"']*)["']/);
-    const alt = altMatch ? altMatch[1] : "";
-    if (alt) return { type: typeName, text: alt, icon };
-    const srcMatch = html.match(/src=["']([^"']*?)["']/);
-    const src = srcMatch ? srcMatch[1].split("/").pop()?.split("?")[0] || "" : "";
-    return { type: typeName, text: src || "(bez popisu)", icon };
-  }
-
-  // Special handling for input
-  if (tag === "input") {
-    const typeAttr = html.match(/type=["']([^"']*)["']/);
-    const inputType = typeAttr ? typeAttr[1] : "text";
-    const placeholder = html.match(/placeholder=["']([^"']*)["']/);
-    const name = html.match(/name=["']([^"']*)["']/);
-    const label = placeholder?.[1] || name?.[1] || inputType;
-    return { type: typeName, text: label, icon };
-  }
-
-  return { type: typeName, text: text || tag, icon };
-}
-
-function NodeItem({ node }: { node: { html: string; target: string; failureSummary: string; screenshot?: string }; index: number }) {
-  const [showCode, setShowCode] = useState(false);
-  const { type, text, icon } = describeElement(node.html);
-
-  return (
-    <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
-      {/* Screenshot preview */}
-      {node.screenshot && (
-        <div className="bg-slate-50 border-b border-slate-200 p-2">
-          <img
-            src={node.screenshot}
-            alt={`${type}: ${text}`}
-            className="rounded border border-slate-200 w-full max-h-48 object-contain"
-            loading="lazy"
-          />
-        </div>
-      )}
-
-      {/* Human-readable summary */}
-      <div className="p-3 flex items-start gap-3">
-        <span className="text-lg shrink-0 mt-0.5" aria-hidden="true">{icon}</span>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-slate-800">
-            {type}{text ? ": " : ""}<span className="font-normal text-slate-600">{text}</span>
-          </p>
-          {node.target && (
-            <p className="text-xs text-slate-400 mt-0.5 truncate" title={node.target}>
-              {node.target}
-            </p>
-          )}
-        </div>
-        <button
-          onClick={() => setShowCode(!showCode)}
-          className="shrink-0 text-xs text-indigo-600 hover:text-indigo-800 font-medium px-2 py-1 rounded hover:bg-indigo-50 transition-colors cursor-pointer"
-        >
-          {showCode ? "Skrýt kód" : "Zobrazit kód"}
-        </button>
-      </div>
-
-      {/* Technical details (for developers) */}
-      {showCode && (
-        <div className="border-t border-slate-100 bg-slate-900 p-3">
-          <code className="text-xs text-slate-300 break-all whitespace-pre-wrap block">
-            {node.html}
-          </code>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pageUrl?: string }) {
   const [expanded, setExpanded] = useState(false);
+  const [showDevDetails, setShowDevDetails] = useState(false);
   const colorClasses = getImpactColor(issue.impact);
+
+  // Nodes that have screenshots — shown as representative examples
+  const screenshotNodes = issue.nodes.filter((n) => n.screenshot);
+  // Total affected elements count
+  const totalNodes = issue.nodes.length;
 
   return (
     <div className={`rounded-xl border-2 overflow-hidden transition-all ${colorClasses}`}>
@@ -152,10 +32,9 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
           <p className="mt-1 text-sm opacity-80 leading-relaxed">
             {issue.description}
           </p>
-          {/* Quick summary of affected elements count */}
-          {issue.nodes.length > 0 && (
+          {totalNodes > 0 && (
             <p className="mt-2 text-xs font-medium opacity-60">
-              {issue.nodes.length} {issue.nodes.length === 1 ? "výskyt" : issue.nodes.length < 5 ? "výskyty" : "výskytů"} na stránce
+              {totalNodes} {totalNodes === 1 ? "výskyt" : totalNodes < 5 ? "výskyty" : "výskytů"} na stránce
             </p>
           )}
         </div>
@@ -177,7 +56,7 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
       </button>
 
       {expanded && (
-        <div className="border-t border-current/10 bg-white/60 p-4 sm:p-5 space-y-4">
+        <div className="border-t border-current/10 bg-white/60 p-4 sm:p-5 space-y-5">
           {/* Fix instruction */}
           {issue.fix && (
             <div className="flex gap-3">
@@ -197,23 +76,35 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
             </div>
           )}
 
-          {/* Affected elements */}
-          {issue.nodes.length > 0 && (
+          {/* Representative screenshots — visual examples of the problem */}
+          {screenshotNodes.length > 0 && (
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                Kde na stránce ({issue.nodes.length})
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                {screenshotNodes.length === 1 ? "Příklad na stránce" : "Příklady na stránce"}
               </p>
-              <div className="space-y-2">
-                {issue.nodes.slice(0, 8).map((node, i) => (
-                  <NodeItem key={i} node={node} index={i} />
+              <div className="space-y-3">
+                {screenshotNodes.map((node, i) => (
+                  <div key={i} className="rounded-lg border border-slate-200 overflow-hidden bg-white">
+                    <img
+                      src={node.screenshot}
+                      alt={`Problém na stránce - ${issue.title}`}
+                      className="w-full object-contain"
+                      loading="lazy"
+                    />
+                    <p className="px-3 py-2 text-xs text-slate-500 border-t border-slate-100">
+                      Červeně zvýrazněný prvek na stránce
+                    </p>
+                  </div>
                 ))}
-                {issue.nodes.length > 8 && (
-                  <p className="text-xs text-slate-500 italic">
-                    … a dalších {issue.nodes.length - 8} výskytů
-                  </p>
-                )}
               </div>
             </div>
+          )}
+
+          {/* Affected count summary */}
+          {totalNodes > 1 && (
+            <p className="text-sm text-slate-600">
+              Celkem nalezeno na <strong>{totalNodes}</strong> {totalNodes < 5 ? "místech" : "místech"} na stránce.
+            </p>
           )}
 
           {/* Links row */}
@@ -247,6 +138,55 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
               </svg>
             </a>
           </div>
+
+          {/* Developer details — expandable */}
+          {totalNodes > 0 && (
+            <div className="border-t border-slate-200 pt-4 mt-2">
+              <button
+                onClick={() => setShowDevDetails(!showDevDetails)}
+                className="text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`transition-transform ${showDevDetails ? "rotate-90" : ""}`}
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+                Pro vývojáře — {totalNodes} {totalNodes === 1 ? "prvek" : totalNodes < 5 ? "prvky" : "prvků"}
+              </button>
+
+              {showDevDetails && (
+                <div className="mt-3 space-y-2">
+                  {issue.nodes.slice(0, 20).map((node, i) => (
+                    <div key={i} className="rounded border border-slate-200 bg-white overflow-hidden">
+                      <div className="px-3 py-2 flex items-center justify-between gap-2">
+                        <code className="text-xs text-slate-500 truncate flex-1" title={node.target}>
+                          {node.target}
+                        </code>
+                      </div>
+                      <div className="border-t border-slate-100 bg-slate-900 px-3 py-2">
+                        <code className="text-xs text-slate-300 break-all whitespace-pre-wrap block">
+                          {node.html}
+                        </code>
+                      </div>
+                    </div>
+                  ))}
+                  {totalNodes > 20 && (
+                    <p className="text-xs text-slate-400 italic">
+                      ... a dalších {totalNodes - 20} prvků
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
