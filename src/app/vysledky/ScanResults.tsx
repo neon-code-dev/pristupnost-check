@@ -274,7 +274,7 @@ export default function ScanResults() {
                     Potřebujete kompletní audit?
                   </h3>
                   <p className="text-slate-500 text-sm">
-                    Automatický sken kontroluje jednu stránku. Celý web má stránky desítky až tisíce. Poptejte kompletní audit nebo pravidelný monitoring — nezávazně.
+                    Tohle byla jedna stránka. Kompletní audit projde celý web a dodá prioritizovaný plán oprav.
                   </p>
                 </div>
                 <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
