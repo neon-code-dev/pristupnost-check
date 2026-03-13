@@ -9,9 +9,8 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
   const [showDevDetails, setShowDevDetails] = useState(false);
   const colorClasses = getImpactColor(issue.impact);
 
-  // Nodes that have screenshots — shown as representative examples
+  // All nodes with screenshots
   const screenshotNodes = issue.nodes.filter((n) => n.screenshot);
-  // Total affected elements count
   const totalNodes = issue.nodes.length;
 
   return (
@@ -76,14 +75,14 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
             </div>
           )}
 
-          {/* Representative screenshots — visual examples of the problem */}
+          {/* Screenshots — show ALL available, max 6 in a grid */}
           {screenshotNodes.length > 0 && (
             <div>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
-                {screenshotNodes.length === 1 ? "Příklad na stránce" : "Příklady na stránce"}
+                Kde na stránce
               </p>
-              <div className="space-y-3">
-                {screenshotNodes.map((node, i) => (
+              <div className={`grid gap-3 ${screenshotNodes.length === 1 ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}>
+                {screenshotNodes.slice(0, 6).map((node, i) => (
                   <div key={i} className="rounded-lg border border-slate-200 overflow-hidden bg-white">
                     <img
                       src={node.screenshot}
@@ -94,13 +93,18 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
                   </div>
                 ))}
               </div>
+              {screenshotNodes.length > 6 && (
+                <p className="text-xs text-slate-500 mt-2">
+                  ... a dalších {screenshotNodes.length - 6} míst
+                </p>
+              )}
             </div>
           )}
 
           {/* Affected count summary */}
-          {totalNodes > 1 && (
+          {totalNodes > screenshotNodes.length && (
             <p className="text-sm text-slate-600">
-              Celkem nalezeno na <strong>{totalNodes}</strong> {totalNodes < 5 ? "místech" : "místech"} na stránce.
+              Celkem nalezeno na <strong>{totalNodes}</strong> místech na stránce.
             </p>
           )}
 
@@ -163,8 +167,8 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
                 <div className="mt-3 space-y-2">
                   {issue.nodes.slice(0, 20).map((node, i) => (
                     <div key={i} className="rounded border border-slate-200 bg-white overflow-hidden">
-                      <div className="px-3 py-2 flex items-center justify-between gap-2">
-                        <code className="text-xs text-slate-500 truncate flex-1" title={node.target}>
+                      <div className="px-3 py-2">
+                        <code className="text-xs text-slate-500 truncate block" title={node.target}>
                           {node.target}
                         </code>
                       </div>

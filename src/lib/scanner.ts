@@ -85,8 +85,6 @@ function mapViolation(
   };
 }
 
-const SCREENSHOT_MAX_TOTAL = 10;
-const SCREENSHOT_MAX_PER_RULE = 2;
 const SCREENSHOT_CLIP_W = 800;
 const SCREENSHOT_CLIP_H = 400;
 const SCREENSHOT_QUALITY = 55;
@@ -94,85 +92,87 @@ const SCREENSHOT_PAD = 80;
 const VIEWPORT_W = 1366;
 const VIEWPORT_H = 768;
 
+/** Capture one screenshot per node selector. Returns map: selector → data:image/jpeg;base64,... */
 async function captureScreenshots(
   page: Awaited<ReturnType<Awaited<ReturnType<typeof puppeteer.launch>>["newPage"]>>,
   violations: AxeRuleResult[],
 ): Promise<Map<string, string>> {
   const shots = new Map<string, string>();
-  let total = 0;
 
+  // Collect unique selectors across all violations — first occurrence per rule gets priority
+  const selectorQueue: string[] = [];
+  const seen = new Set<string>();
   for (const violation of violations) {
-    if (total >= SCREENSHOT_MAX_TOTAL) break;
-    let perRule = 0;
-
     for (const node of violation.nodes) {
-      if (total >= SCREENSHOT_MAX_TOTAL || perRule >= SCREENSHOT_MAX_PER_RULE) break;
-      const selector = node.target[0];
-      if (!selector || shots.has(selector)) continue;
+      const sel = node.target[0];
+      if (sel && !seen.has(sel)) {
+        seen.add(sel);
+        selectorQueue.push(sel);
+      }
+    }
+  }
+
+  for (const selector of selectorQueue) {
+    try {
+      const el = await page.$(selector);
+      if (!el) continue;
+
+      // Scroll element to center of viewport
+      await page.evaluate((s: string) => {
+        document.querySelector(s)?.scrollIntoView({ block: "center", inline: "center" });
+      }, selector);
+      await new Promise((r) => setTimeout(r, 100));
+
+      // Add red outline highlight
+      await page.evaluate((s: string) => {
+        const e = document.querySelector(s) as HTMLElement | null;
+        if (e) {
+          e.style.setProperty("outline", "4px solid #dc2626", "important");
+          e.style.setProperty("outline-offset", "3px", "important");
+        }
+      }, selector);
 
       try {
-        const el = await page.$(selector);
-        if (!el) continue;
+        const box = await el.boundingBox();
+        if (!box || box.width < 1 || box.height < 1) continue;
 
-        // Scroll element to center of viewport
-        await page.evaluate((s: string) => {
-          document.querySelector(s)?.scrollIntoView({ block: "center", inline: "center" });
-        }, selector);
-        await new Promise((r) => setTimeout(r, 100));
+        // Calculate clip region centered on element with generous context
+        const pad = SCREENSHOT_PAD;
+        const w = Math.min(box.width + pad * 2, SCREENSHOT_CLIP_W);
+        const h = Math.min(box.height + pad * 2, SCREENSHOT_CLIP_H);
+        const cx = box.x + box.width / 2;
+        const cy = box.y + box.height / 2;
+        const clipX = Math.max(0, cx - w / 2);
+        const clipY = Math.max(0, cy - h / 2);
 
-        // Add red outline highlight
+        const clip = {
+          x: clipX,
+          y: clipY,
+          width: Math.min(w, VIEWPORT_W - clipX),
+          height: Math.min(h, VIEWPORT_H - clipY),
+        };
+        if (clip.width < 10 || clip.height < 10) continue;
+
+        const buf = await page.screenshot({
+          encoding: "base64",
+          type: "jpeg",
+          quality: SCREENSHOT_QUALITY,
+          clip,
+        });
+
+        shots.set(selector, `data:image/jpeg;base64,${buf}`);
+      } finally {
+        // Always remove outline to avoid leaking into subsequent screenshots
         await page.evaluate((s: string) => {
           const e = document.querySelector(s) as HTMLElement | null;
           if (e) {
-            e.style.setProperty("outline", "4px solid #dc2626", "important");
-            e.style.setProperty("outline-offset", "3px", "important");
+            e.style.removeProperty("outline");
+            e.style.removeProperty("outline-offset");
           }
-        }, selector);
-
-        try {
-          const box = await el.boundingBox();
-          if (!box || box.width < 1 || box.height < 1) continue;
-
-          // Calculate clip region centered on element with generous context
-          const pad = SCREENSHOT_PAD;
-          const w = Math.min(box.width + pad * 2, SCREENSHOT_CLIP_W);
-          const h = Math.min(box.height + pad * 2, SCREENSHOT_CLIP_H);
-          const cx = box.x + box.width / 2;
-          const cy = box.y + box.height / 2;
-          const clipX = Math.max(0, cx - w / 2);
-          const clipY = Math.max(0, cy - h / 2);
-
-          const clip = {
-            x: clipX,
-            y: clipY,
-            width: Math.min(w, VIEWPORT_W - clipX),
-            height: Math.min(h, VIEWPORT_H - clipY),
-          };
-          if (clip.width < 10 || clip.height < 10) continue;
-
-          const buf = await page.screenshot({
-            encoding: "base64",
-            type: "jpeg",
-            quality: SCREENSHOT_QUALITY,
-            clip,
-          });
-
-          shots.set(selector, `data:image/jpeg;base64,${buf}`);
-          total++;
-          perRule++;
-        } finally {
-          // Always remove outline to avoid leaking into subsequent screenshots
-          await page.evaluate((s: string) => {
-            const e = document.querySelector(s) as HTMLElement | null;
-            if (e) {
-              e.style.removeProperty("outline");
-              e.style.removeProperty("outline-offset");
-            }
-          }, selector).catch(() => {});
-        }
-      } catch {
-        // Skip elements that can't be captured
+        }, selector).catch(() => {});
       }
+    } catch {
+      // Skip elements that can't be captured
     }
   }
 
