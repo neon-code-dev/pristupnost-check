@@ -7,7 +7,7 @@ const ALLOWED_ORIGINS = [
   "http://localhost:3000",
 ];
 
-function corsHeaders(origin: string | null): HeadersInit {
+function corsHeaders(origin: string | null): Record<string, string> {
   const headers: Record<string, string> = {
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
@@ -21,14 +21,23 @@ function corsHeaders(origin: string | null): HeadersInit {
 function jsonResponse(
   data: object,
   status: number,
-  cors: HeadersInit
+  cors: Record<string, string>
 ): NextResponse {
-  return NextResponse.json(data, { status, headers: cors });
+  const res = NextResponse.json(data, { status });
+  for (const [key, value] of Object.entries(cors)) {
+    res.headers.set(key, value);
+  }
+  return res;
 }
 
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get("origin");
-  return new NextResponse(null, { status: 204, headers: corsHeaders(origin) });
+  const cors = corsHeaders(origin);
+  const res = new NextResponse(null, { status: 204 });
+  for (const [key, value] of Object.entries(cors)) {
+    res.headers.set(key, value);
+  }
+  return res;
 }
 
 export async function POST(request: NextRequest) {
