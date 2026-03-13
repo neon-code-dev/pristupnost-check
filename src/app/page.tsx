@@ -1,4 +1,5 @@
 import ScanForm from "@/components/ScanForm";
+import ContactForm from "@/components/ContactForm";
 import Script from "next/script";
 
 const checks = [
@@ -123,6 +124,7 @@ export default function Home() {
             <a href="#priklady" className="hover:text-slate-900 transition-colors">Příklady</a>
             <a href="#proc" className="hover:text-slate-900 transition-colors">Proč řešit</a>
             <a href="#faq" className="hover:text-slate-900 transition-colors">FAQ</a>
+            <a href="#kontakt" className="hover:text-slate-900 transition-colors">Kontakt</a>
           </nav>
         </div>
       </header>
@@ -521,6 +523,28 @@ export default function Home() {
                   <p className="text-sm text-slate-500 leading-relaxed">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Contact / Lead capture */}
+        <section id="kontakt" className="py-16 sm:py-24 bg-white border-y border-slate-200">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="max-w-lg mx-auto">
+              <div className="text-center mb-8">
+                <h2
+                  className="text-2xl sm:text-3xl font-black text-slate-950 mb-3"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  Potřebujete kompletní audit?
+                </h2>
+                <p className="text-slate-500">
+                  Automatický sken kontroluje jednu stránku. Celý web jich má desítky až tisíce. Poptejte kompletní audit celého webu nebo pravidelný monitoring — nezávazně, ozveme se do 24 hodin.
+                </p>
+              </div>
+              <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl p-6 sm:p-8">
+                <ContactForm />
+              </div>
             </div>
           </div>
         </section>

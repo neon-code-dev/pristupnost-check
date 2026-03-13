@@ -9,6 +9,7 @@ import ScoreCircle from "@/components/ScoreCircle";
 import ViolationCard from "@/components/ViolationCard";
 import LoadingState from "@/components/LoadingState";
 import ScanForm from "@/components/ScanForm";
+import ContactForm from "@/components/ContactForm";
 
 type SeverityGroup = {
   impact: string;
@@ -261,6 +262,24 @@ export default function ScanResults() {
                 <p className="text-sm text-slate-600 leading-relaxed">
                   <strong className="text-slate-800">Upozornění:</strong> Automatický sken pokrývá přibližně 30–40 % požadavků WCAG 2.1 AA. Kontrola barevného kontrastu, testování klávesnicí a testování se čtečkou obrazovky vyžadují manuální audit. Tento nástroj není právním poradenstvím.
                 </p>
+              </div>
+
+              {/* Lead capture form */}
+              <div className="mb-12 max-w-lg mx-auto">
+                <div className="text-center mb-6">
+                  <h3
+                    className="text-xl sm:text-2xl font-black text-slate-950 mb-2"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    Potřebujete kompletní audit?
+                  </h3>
+                  <p className="text-slate-500 text-sm">
+                    Automatický sken kontroluje jednu stránku. Celý web má stránky desítky až tisíce. Poptejte kompletní audit nebo pravidelný monitoring — nezávazně.
+                  </p>
+                </div>
+                <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
+                  <ContactForm websiteUrl={result.url} />
+                </div>
               </div>
 
               <div className="text-center">
