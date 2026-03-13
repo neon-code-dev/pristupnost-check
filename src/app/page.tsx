@@ -133,7 +133,7 @@ export default function Home() {
       <main className="flex-1">
         <section>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-20 sm:pb-28">
-            <div className="max-w-3xl">
+            <div className="max-w-3xl mx-auto text-center">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-semibold mb-6 tracking-wide uppercase">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
                 Zákon 424/2023 Sb. platí od 28. 6. 2025

@@ -36,7 +36,7 @@ export default function ScanForm({ size = "large" }: { size?: "large" | "compact
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-xl">
+    <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto">
       <div className="relative">
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
