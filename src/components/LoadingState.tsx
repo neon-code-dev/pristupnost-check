@@ -42,7 +42,7 @@ export default function LoadingState({ url }: { url: string }) {
         {["Načítání stránky", "Analýza DOM", "Kontrola WCAG"].map((step, i) => (
           <span
             key={step}
-            className="text-xs text-slate-400 animate-pulse-slow"
+            className="text-xs text-slate-500 animate-pulse-slow"
             style={{ animationDelay: `${i * 0.6}s` }}
           >
             {step}

@@ -144,7 +144,7 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
             <div className="border-t border-slate-200 pt-4 mt-2">
               <button
                 onClick={() => setShowDevDetails(!showDevDetails)}
-                className="text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <svg
                   width="12"
@@ -179,7 +179,7 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
                     </div>
                   ))}
                   {totalNodes > 20 && (
-                    <p className="text-xs text-slate-400 italic">
+                    <p className="text-xs text-slate-500 italic">
                       ... a dalších {totalNodes - 20} prvků
                     </p>
                   )}

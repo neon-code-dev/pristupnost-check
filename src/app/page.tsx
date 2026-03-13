@@ -240,7 +240,7 @@ export default function Home() {
               ))}
             </div>
 
-            <p className="text-center text-sm text-slate-400 mt-8">
+            <p className="text-center text-sm text-slate-500 mt-8">
               Sken probíhá v plnohodnotném prohlížeči — včetně kontroly barevného kontrastu a velikosti klikacích cílů.
             </p>
           </div>
@@ -371,7 +371,7 @@ export default function Home() {
                     <div className="code-snippet bg-red-50 border border-red-200 rounded-lg p-3 text-red-900">
                       &lt;h1&gt;Náš e-shop&lt;/h1&gt;<br />
                       &lt;h4&gt;Novinky&lt;/h4&gt;&nbsp;&nbsp;
-                      <span className="text-red-400">← přeskočeno h2, h3</span>
+                      <span className="text-red-600">← přeskočeno h2, h3</span>
                     </div>
                     <p className="text-xs text-slate-500 mt-2">Čtečka nerozumí struktuře. Zákazník neví, co je hlavní a co vedlejší.</p>
                   </div>
@@ -561,7 +561,7 @@ export default function Home() {
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="shrink-0 text-slate-400 group-open:rotate-180 transition-transform"
+                        className="shrink-0 text-slate-500 group-open:rotate-180 transition-transform"
                       >
                         <polyline points="6 9 12 15 18 9" />
                       </svg>
