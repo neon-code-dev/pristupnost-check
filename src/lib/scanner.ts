@@ -85,10 +85,7 @@ function mapViolation(
   };
 }
 
-const SCREENSHOT_CLIP_W = 800;
-const SCREENSHOT_CLIP_H = 400;
 const SCREENSHOT_QUALITY = 55;
-const SCREENSHOT_PAD = 80;
 const VIEWPORT_W = 1366;
 const VIEWPORT_H = 768;
 
@@ -99,7 +96,7 @@ async function captureScreenshots(
 ): Promise<Map<string, string>> {
   const shots = new Map<string, string>();
 
-  // Collect unique selectors across all violations — first occurrence per rule gets priority
+  // Collect unique selectors across all violations
   const selectorQueue: string[] = [];
   const seen = new Set<string>();
   for (const violation of violations) {
@@ -123,12 +120,13 @@ async function captureScreenshots(
       }, selector);
       await new Promise((r) => setTimeout(r, 100));
 
-      // Add red outline highlight
+      // Add visible highlight: red outline + semi-transparent red background tint
       await page.evaluate((s: string) => {
         const e = document.querySelector(s) as HTMLElement | null;
         if (e) {
           e.style.setProperty("outline", "4px solid #dc2626", "important");
           e.style.setProperty("outline-offset", "3px", "important");
+          e.style.setProperty("background-color", "rgba(220,38,38,0.12)", "important");
         }
       }, selector);
 
@@ -136,10 +134,13 @@ async function captureScreenshots(
         const box = await el.boundingBox();
         if (!box || box.width < 1 || box.height < 1) continue;
 
-        // Calculate clip region centered on element with generous context
-        const pad = SCREENSHOT_PAD;
-        const w = Math.min(box.width + pad * 2, SCREENSHOT_CLIP_W);
-        const h = Math.min(box.height + pad * 2, SCREENSHOT_CLIP_H);
+        // Adaptive padding: small for small elements, bigger for large
+        // Ensures the element text is visible, not drowned in background
+        const pad = Math.min(30, Math.max(10, Math.min(box.width, box.height) * 0.3));
+
+        // Clip: element + adaptive padding, capped at reasonable max
+        const w = Math.min(box.width + pad * 2, 700);
+        const h = Math.min(box.height + pad * 2, 350);
         const cx = box.x + box.width / 2;
         const cy = box.y + box.height / 2;
         const clipX = Math.max(0, cx - w / 2);
@@ -162,12 +163,13 @@ async function captureScreenshots(
 
         shots.set(selector, `data:image/jpeg;base64,${buf}`);
       } finally {
-        // Always remove outline to avoid leaking into subsequent screenshots
+        // Always remove highlight to avoid leaking into subsequent screenshots
         await page.evaluate((s: string) => {
           const e = document.querySelector(s) as HTMLElement | null;
           if (e) {
             e.style.removeProperty("outline");
             e.style.removeProperty("outline-offset");
+            e.style.removeProperty("background-color");
           }
         }, selector).catch(() => {});
       }
