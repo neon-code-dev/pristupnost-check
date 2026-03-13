@@ -27,7 +27,7 @@ export interface ScanResult {
   scanTimeMs: number;
 }
 
-const FETCH_TIMEOUT_MS = 8000;
+const FETCH_TIMEOUT_MS = 15000;
 
 function normalizeUrl(input: string): string {
   let url = input.trim();

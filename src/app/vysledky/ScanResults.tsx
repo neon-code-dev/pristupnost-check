@@ -67,6 +67,16 @@ export default function ScanResults() {
           signal: controller.signal,
         });
 
+        const contentType = res.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) {
+          setError(`Server vrátil chybu ${res.status}. Zkuste to znovu.`);
+          posthog.capture("scan_error", {
+            scanned_url: url,
+            error: `non-json-response-${res.status}`,
+          });
+          return;
+        }
+
         const data = await res.json();
 
         if (!res.ok) {
