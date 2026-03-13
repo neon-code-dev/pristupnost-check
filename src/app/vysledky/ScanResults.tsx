@@ -214,7 +214,7 @@ export default function ScanResults() {
                     </h2>
                     <div className="space-y-3">
                       {group.issues.map((issue) => (
-                        <ViolationCard key={issue.id} issue={issue} />
+                        <ViolationCard key={issue.id} issue={issue} pageUrl={result.url} />
                       ))}
                     </div>
                   </section>
@@ -249,7 +249,7 @@ export default function ScanResults() {
                 </p>
                 <div className="space-y-3">
                   {result.incomplete.map((issue) => (
-                    <ViolationCard key={issue.id} issue={issue} />
+                    <ViolationCard key={issue.id} issue={issue} pageUrl={result.url} />
                   ))}
                 </div>
               </section>
