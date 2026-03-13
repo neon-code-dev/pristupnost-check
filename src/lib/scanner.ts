@@ -112,6 +112,12 @@ async function captureScreenshots(
       const el = await page.$(selector);
       if (!el) continue;
 
+      // Scroll element into view — helps capture off-viewport elements (carousels, lazy-loaded)
+      await page.evaluate((s: string) => {
+        const e = document.querySelector(s);
+        if (e) e.scrollIntoView({ block: "center", behavior: "instant" });
+      }, selector).catch(() => {});
+
       const box = await el.boundingBox();
       if (!box || box.width < 1 || box.height < 1) continue;
 
