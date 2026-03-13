@@ -398,9 +398,8 @@ export default function Home() {
             <div className="text-center mt-10">
               <p className="text-slate-500 mb-4">Chcete vědět, kolik takových problémů má váš e-shop?</p>
               <a
-                href="#top"
+                href="#"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-700 text-white font-semibold hover:bg-indigo-800 transition-colors"
-                onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
                 Spustit kontrolu zdarma
               </a>
