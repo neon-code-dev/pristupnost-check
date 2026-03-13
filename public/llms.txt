@@ -1,0 +1,44 @@
+# PřístupnostCheck
+
+> Bezplatná kontrola přístupnosti webových stránek a e-shopů podle WCAG 2.1 AA. Výsledky v češtině.
+
+## Co to je
+PřístupnostCheck je online nástroj pro automatickou kontrolu přístupnosti (accessibility) webových stránek. Skenuje stránku v reálném prohlížeči (Chromium) a analyzuje ji pomocí axe-core — stejného engine jako Google Lighthouse.
+
+## URL
+https://pristupnost-check.vercel.app
+
+## Jak to funguje
+1. Uživatel zadá URL webové stránky nebo e-shopu
+2. Server spustí headless Chromium, načte stránku a injektuje axe-core
+3. Axe-core zkontroluje desítky pravidel WCAG 2.1 AA a WCAG 2.2 AA
+4. Výsledky se zobrazí v češtině — skóre, seznam problémů s návodem na opravu
+
+## Co kontroluje
+- Alternativní texty obrázků (image-alt)
+- Barevný kontrast textu (color-contrast)
+- Struktura nadpisů h1-h6 (heading-order)
+- Formuláře a přiřazení popisků (label)
+- ARIA atributy a landmark oblasti
+- Velikost klikacích cílů (target-size, WCAG 2.2)
+- Navigace klávesnicí
+- Titulky iframe elementů (frame-title)
+
+## Kontext
+Zákon 424/2023 Sb. (transpozice EU směrnice 2019/882 — European Accessibility Act) ukládá provozovatelům e-shopů povinnost zajistit přístupnost webových služeb od 28. června 2025. Dozor vykonává Česká obchodní inspekce (ČOI), pokuty až 10 000 000 Kč.
+
+## API
+POST /api/scan
+Content-Type: application/json
+Body: {"url": "https://example.com"}
+Response: JSON s výsledky (score, violations, passes, incomplete)
+
+## Technologie
+- Next.js 16 (App Router)
+- Puppeteer + @sparticuz/chromium-min (headless browser)
+- axe-core 4.11 (accessibility engine, MPL-2.0)
+- Vercel (hosting)
+
+## Licence
+Engine axe-core je pod licencí MPL-2.0 (Mozilla Public License).
+Tento nástroj není právním poradenstvím.
