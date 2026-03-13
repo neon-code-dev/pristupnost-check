@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { scanUrl } from "@/lib/scanner";
 
 export const maxDuration = 30;
 
@@ -38,12 +37,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Dynamic import to catch module-level errors (jsdom/axe-core on Vercel)
+    const { scanUrl } = await import("@/lib/scanner");
     const result = await scanUrl(url);
 
     return NextResponse.json(result);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Neznámá chyba při skenování";
+    const stack =
+      error instanceof Error ? error.stack : undefined;
+
+    console.error("Scan error:", message, stack);
 
     if (message.includes("Invalid URL") || message.includes("ERR_INVALID_URL")) {
       return NextResponse.json(
@@ -54,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     if (message.includes("abort") || message.includes("timeout") || message.includes("TIMEOUT")) {
       return NextResponse.json(
-        { error: "Stránka neodpověděla včas (timeout 8s). Zkuste to znovu nebo zkontrolujte URL." },
+        { error: "Stránka neodpověděla včas (timeout 15s). Zkuste to znovu nebo zkontrolujte URL." },
         { status: 504 }
       );
     }
@@ -66,7 +71,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Scan error:", message);
     return NextResponse.json(
       { error: `Chyba při skenování: ${message}` },
       { status: 500 }
