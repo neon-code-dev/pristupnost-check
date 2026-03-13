@@ -241,7 +241,7 @@ export default function Home() {
             </div>
 
             <p className="text-center text-sm text-slate-400 mt-8">
-              Poznámka: Kontrola barevného kontrastu vyžaduje plný rendering stránky a není zatím součástí bezplatného skenu.
+              Sken probíhá v plnohodnotném prohlížeči — včetně kontroly barevného kontrastu a velikosti klikacích cílů.
             </p>
           </div>
         </section>

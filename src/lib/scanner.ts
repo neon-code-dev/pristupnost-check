@@ -1,5 +1,6 @@
-import { JSDOM } from "jsdom";
-import axe, { type Result, type NodeResult } from "axe-core";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
+import axe from "axe-core";
 import { getCzechTranslation } from "./translations";
 
 export interface ScanIssue {
@@ -27,50 +28,39 @@ export interface ScanResult {
   scanTimeMs: number;
 }
 
-const FETCH_TIMEOUT_MS = 15000;
+interface AxeNodeResult {
+  html: string;
+  target: string[];
+  failureSummary?: string;
+}
+
+interface AxeRuleResult {
+  id: string;
+  impact?: string;
+  help: string;
+  description: string;
+  helpUrl: string;
+  nodes: AxeNodeResult[];
+}
+
+interface AxeResults {
+  passes: AxeRuleResult[];
+  violations: AxeRuleResult[];
+  incomplete: AxeRuleResult[];
+}
+
+const PAGE_TIMEOUT_MS = 20000;
 
 function normalizeUrl(input: string): string {
   let url = input.trim();
   if (!url.match(/^https?:\/\//i)) {
     url = `https://${url}`;
   }
-  // Validate URL format
-  new URL(url); // throws if invalid
+  new URL(url);
   return url;
 }
 
-async function fetchPage(url: string): Promise<string> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent":
-          "PristupnostCheck/1.0 (accessibility scanner; +https://pristupnost-check.vercel.app)",
-        Accept: "text/html,application/xhtml+xml",
-        "Accept-Language": "cs,en;q=0.5",
-      },
-      redirect: "follow",
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const contentType = response.headers.get("content-type") || "";
-    if (!contentType.includes("text/html") && !contentType.includes("xhtml")) {
-      throw new Error("Stránka nevrátila HTML obsah");
-    }
-
-    return await response.text();
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-function mapViolation(result: Result): ScanIssue {
+function mapViolation(result: AxeRuleResult): ScanIssue {
   const translation = getCzechTranslation(result.id);
 
   return {
@@ -80,7 +70,7 @@ function mapViolation(result: Result): ScanIssue {
     description: translation?.description || result.description,
     helpUrl: result.helpUrl,
     fix: translation?.fix || "",
-    nodes: result.nodes.map((node: NodeResult) => ({
+    nodes: result.nodes.map((node) => ({
       html: node.html.length > 300 ? node.html.slice(0, 300) + "…" : node.html,
       target: node.target.join(", "),
       failureSummary: node.failureSummary || "",
@@ -97,38 +87,69 @@ function calculateScore(passes: number, violations: number): number {
 export async function scanUrl(inputUrl: string): Promise<ScanResult> {
   const start = Date.now();
   const url = normalizeUrl(inputUrl);
-  const html = await fetchPage(url);
 
-  const dom = new JSDOM(html, {
-    url,
-    runScripts: "outside-only",
-    pretendToBeVisual: true,
+  // Disable WebGL for faster startup
+  chromium.setGraphicsMode = false;
+
+  const browser = await puppeteer.launch({
+    args: puppeteer.defaultArgs({
+      args: chromium.args,
+      headless: "shell",
+    }),
+    defaultViewport: { width: 1366, height: 768 },
+    executablePath: await chromium.executablePath(),
+    headless: "shell",
   });
 
-  // axe-core needs global window/document to function in Node.js
-  const prevWindow = globalThis.window;
-  const prevDocument = globalThis.document;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).window = dom.window;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).document = dom.window.document;
-
   try {
-    const results = await axe.run(dom.window.document.documentElement, {
-      rules: {
-        // Disable rules that don't work in jsdom
-        "color-contrast": { enabled: false },
-      },
-      runOnly: {
-        type: "tag",
-        values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"],
-      },
+    const page = await browser.newPage();
+
+    // Set realistic browser headers
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    );
+
+    // Navigate and wait for network to settle
+    await page.goto(url, {
+      waitUntil: "networkidle2",
+      timeout: PAGE_TIMEOUT_MS,
+    });
+
+    // Inject axe-core into the page
+    await page.addScriptTag({ content: axe.source });
+
+    // Run axe-core in the browser context (all rules, including color-contrast and target-size)
+    const results: AxeResults = await page.evaluate(() => {
+      return new Promise<AxeResults>((resolve, reject) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const w = window as any;
+        if (!w.axe) {
+          reject(new Error("axe-core not loaded"));
+          return;
+        }
+        w.axe
+          .run(document, {
+            runOnly: {
+              type: "tag",
+              values: [
+                "wcag2a",
+                "wcag2aa",
+                "wcag21a",
+                "wcag21aa",
+                "wcag22aa",
+                "best-practice",
+              ],
+            },
+          })
+          .then((r: AxeResults) => resolve(r))
+          .catch((e: Error) => reject(e));
+      });
     });
 
     const violations = results.violations.map(mapViolation);
     const incomplete = results.incomplete
       .filter((r) => r.nodes.length > 0)
-      .slice(0, 5)
+      .slice(0, 10)
       .map(mapViolation);
 
     return {
@@ -142,21 +163,6 @@ export async function scanUrl(inputUrl: string): Promise<ScanResult> {
       scanTimeMs: Date.now() - start,
     };
   } finally {
-    // Restore globals
-    if (prevWindow) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (globalThis as any).window = prevWindow;
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (globalThis as any).window;
-    }
-    if (prevDocument) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (globalThis as any).document = prevDocument;
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (globalThis as any).document;
-    }
-    dom.window.close();
+    await browser.close();
   }
 }

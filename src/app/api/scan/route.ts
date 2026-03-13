@@ -57,10 +57,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (message.includes("abort") || message.includes("timeout") || message.includes("TIMEOUT")) {
+    if (message.includes("abort") || message.includes("timeout") || message.includes("TIMEOUT") || message.includes("TimeoutError") || message.includes("Navigation timeout")) {
       return NextResponse.json(
-        { error: "Stránka neodpověděla včas (timeout 15s). Zkuste to znovu nebo zkontrolujte URL." },
+        { error: "Stránka neodpověděla včas (timeout 20s). Zkuste to znovu nebo zkontrolujte URL." },
         { status: 504 }
+      );
+    }
+
+    if (message.includes("net::ERR_NAME_NOT_RESOLVED")) {
+      return NextResponse.json(
+        { error: "Doména nebyla nalezena. Zkontrolujte URL adresu." },
+        { status: 400 }
+      );
+    }
+
+    if (message.includes("net::ERR_CONNECTION_REFUSED") || message.includes("net::ERR_CONNECTION_RESET")) {
+      return NextResponse.json(
+        { error: "Nepodařilo se připojit k serveru. Stránka může být nedostupná." },
+        { status: 502 }
+      );
+    }
+
+    if (message.includes("net::ERR_CERT") || message.includes("net::ERR_SSL")) {
+      return NextResponse.json(
+        { error: "Chyba SSL certifikátu. Stránka nemá platný HTTPS certifikát." },
+        { status: 502 }
       );
     }
 
