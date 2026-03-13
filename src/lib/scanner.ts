@@ -196,39 +196,57 @@ export async function scanUrl(inputUrl: string): Promise<ScanResult> {
       timeout: PAGE_TIMEOUT_MS,
     });
 
-    // Give JS a moment to render dynamic content
+    // Give JS a moment to render dynamic content (and settle any JS redirects)
     await new Promise((r) => setTimeout(r, 2000));
 
-    // Inject axe-core into the page
-    await page.addScriptTag({ content: axe.source });
+    // Inject and run axe-core with retry (handles late redirects that destroy context)
+    const AXE_ATTEMPTS = 2;
+    let results: AxeResults | null = null;
 
-    // Run axe-core in the browser context (all rules, including color-contrast and target-size)
-    const results: AxeResults = await page.evaluate(() => {
-      return new Promise<AxeResults>((resolve, reject) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const w = window as any;
-        if (!w.axe) {
-          reject(new Error("axe-core not loaded"));
-          return;
+    for (let attempt = 1; attempt <= AXE_ATTEMPTS; attempt++) {
+      try {
+        await page.addScriptTag({ content: axe.source });
+
+        results = await page.evaluate(() => {
+          return new Promise<AxeResults>((resolve, reject) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const w = window as any;
+            if (!w.axe) {
+              reject(new Error("axe-core not loaded"));
+              return;
+            }
+            w.axe
+              .run(document, {
+                runOnly: {
+                  type: "tag",
+                  values: [
+                    "wcag2a",
+                    "wcag2aa",
+                    "wcag21a",
+                    "wcag21aa",
+                    "wcag22aa",
+                    "best-practice",
+                  ],
+                },
+              })
+              .then((r: AxeResults) => resolve(r))
+              .catch((e: Error) => reject(e));
+          });
+        });
+        break; // Success — exit retry loop
+      } catch (err) {
+        if (attempt === AXE_ATTEMPTS) throw err;
+        // Wait for any in-flight navigation to settle, then retry
+        await new Promise((r) => setTimeout(r, 2000));
+        try {
+          await page.waitForNavigation({ waitUntil: "load", timeout: 5000 });
+        } catch {
+          // No navigation — page might have settled already
         }
-        w.axe
-          .run(document, {
-            runOnly: {
-              type: "tag",
-              values: [
-                "wcag2a",
-                "wcag2aa",
-                "wcag21a",
-                "wcag21aa",
-                "wcag22aa",
-                "best-practice",
-              ],
-            },
-          })
-          .then((r: AxeResults) => resolve(r))
-          .catch((e: Error) => reject(e));
-      });
-    });
+      }
+    }
+
+    if (!results) throw new Error("axe-core not loaded");
 
     // Capture screenshots of violating elements while browser is open
     const incompleteFiltered = results.incomplete

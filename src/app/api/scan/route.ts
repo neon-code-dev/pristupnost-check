@@ -120,6 +120,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (message.includes("Navigating frame was detached") || message.includes("Execution context was destroyed") || message.includes("most likely because of a navigation")) {
+      return jsonResponse(
+        { error: "Stránka se během kontroly přesměrovala. Zkuste to znovu — pokud problém přetrvává, stránka nemusí být kompatibilní s automatickým skenem." },
+        502, cors
+      );
+    }
+
+    if (message.includes("axe-core not loaded")) {
+      return jsonResponse(
+        { error: "Nepodařilo se spustit kontrolu přístupnosti na této stránce. Stránka pravděpodobně blokuje vkládání testovacích skriptů (CSP)." },
+        502, cors
+      );
+    }
+
     return jsonResponse(
       { error: `Chyba při skenování: ${message}` },
       500, cors

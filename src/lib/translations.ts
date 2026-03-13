@@ -257,6 +257,48 @@ const translations: Record<string, RuleTranslation> = {
       "Prvek na stránce má přiřazenou roli, která neexistuje. Čtečka obrazovky neví, jak prvek popsat uživateli.",
     fix: "Opravte roli prvku na platnou hodnotu, nebo ji odstraňte.",
   },
+  "aria-dialog-name": {
+    title: "Vyskakovací okno nemá název",
+    description:
+      "Na stránce se otevírá vyskakovací okno (dialog, modal), ale nemá přístupný název. Nevidomý uživatel neví, co se na obrazovce právě otevřelo — slyší jen obsah bez kontextu.",
+    fix: "Přidejte vyskakovacímu oknu název pomocí atributu aria-label nebo aria-labelledby.",
+  },
+  "aria-prohibited-attr": {
+    title: "Prvek má zakázanou přístupnostní značku",
+    description:
+      "Prvek na stránce má přístupnostní značku (ARIA atribut), která u jeho role není povolená. Čtečka obrazovky může předat uživateli zavádějící nebo protichůdné informace.",
+    fix: "Odstraňte nepovolenou přístupnostní značku z prvku.",
+  },
+  "aria-command-name": {
+    title: "Ovládací prvek (tlačítko/odkaz) nemá přístupný název",
+    description:
+      "Na stránce je prvek označený jako tlačítko, odkaz nebo položka menu, ale nemá žádný název. Uživatel čtečky slyší jen typ prvku — například tlačítko — ale neví, co udělá.",
+    fix: "Přidejte přístupný název k ovládacímu prvku (viditelný text, aria-label nebo aria-labelledby).",
+  },
+  "aria-allowed-role": {
+    title: "Prvek má nepřípustnou roli",
+    description:
+      "Prvek na stránce má přiřazenou ARIA roli, která k jeho typu nepatří — například odkaz označený jako tlačítko. Čtečka obrazovky pak popisuje prvek jinak, než jak se skutečně chová, což uživatele mate.",
+    fix: "Odstraňte nevhodnou roli, nebo použijte správný typ prvku pro danou funkci.",
+  },
+  "aria-hidden-focus": {
+    title: "Skrytý prvek je stále dostupný klávesnicí",
+    description:
+      "Na stránce je prvek, který je označený jako skrytý pro čtečku obrazovky (aria-hidden), ale přesto na něj jde přejít klávesou Tab. Uživatel klávesnice na prvek narazí, ale čtečka mu o něm nic neřekne — je to jako neviditelná překážka.",
+    fix: "Buď prvek úplně skryjte i pro klávesnici (tabindex=\"-1\"), nebo z něj odstraňte aria-hidden.",
+  },
+  "aria-input-field-name": {
+    title: "Vstupní pole nemá přístupný název",
+    description:
+      "Na stránce je vstupní pole (posuvník, textové pole, přepínač) s ARIA rolí, ale nemá přiřazený název. Uživatel čtečky neví, k čemu pole slouží.",
+    fix: "Přidejte vstupnímu poli přístupný název (aria-label nebo aria-labelledby).",
+  },
+  "label-title-only": {
+    title: "Formulářové pole má popisek pouze v atributu title",
+    description:
+      "Pole formuláře nemá viditelný popisek — jeho název je schovaný v atributu title, který se zobrazí jen po najetí myší. Uživatel na mobilu nebo s klávesnicí popisek nevidí a neví, co do pole zadat.",
+    fix: "Přidejte k poli viditelný popisek (element label), nejen atribut title.",
+  },
 
   // ── Navigace a struktura stránky ─────────────────────────
 
@@ -325,6 +367,18 @@ const translations: Record<string, RuleTranslation> = {
     description:
       "Stránka má víc oblastí stejného typu (např. dvě navigace), ale nejsou pojmenované. Čtečka řekne navigace dvakrát a uživatel neví, která je hlavní a která vedlejší.",
     fix: "Pojmenujte duplicitní oblasti — např. Hlavní navigace a Navigace v patičce.",
+  },
+  "skip-link": {
+    title: "Odkaz pro přeskočení navigace nefunguje",
+    description:
+      "Stránka má odkaz Přeskočit na obsah, ale když na něj uživatel přejde klávesnicí, odkaz se nezobrazí. Uživatel klávesnice neví, že může navigaci přeskočit.",
+    fix: "Zajistěte, aby se odkaz pro přeskočení navigace zobrazil, když na něj uživatel přejde klávesou Tab.",
+  },
+  "landmark-complementary-is-top-level": {
+    title: "Doplňková oblast (aside) je na špatném místě v kódu",
+    description:
+      "Doplňková oblast stránky (postranní panel, related obsah) je vnořená uvnitř jiné oblasti místo na nejvyšší úrovni. Čtečka obrazovky ji nemusí správně najít a uživatel přijde o doplňující informace.",
+    fix: "Přesuňte doplňkovou oblast (aside/complementary) na nejvyšší úroveň stránky.",
   },
 
   // ── Seznamy ──────────────────────────────────────────────
@@ -463,6 +517,12 @@ const translations: Record<string, RuleTranslation> = {
     description:
       "Na stránce je víc vložených obsahů (iframe) se stejným popisem. Uživatel je od sebe nerozliší.",
     fix: "Dejte každému vloženému obsahu jedinečný popis.",
+  },
+  "frame-tested": {
+    title: "Vložený obsah (iframe) nebylo možné otestovat",
+    description:
+      "Na stránce je vložený obsah (iframe), který automatická kontrola nedokázala prověřit — může obsahovat další problémy s přístupností, o kterých nevíme.",
+    fix: "Ověřte přístupnost vloženého obsahu ručně, nebo zajistěte, aby iframe povoloval testování (skript axe-core musí být přítomný i uvnitř iframe).",
   },
 
   // ── Obrázková mapa a objekty ─────────────────────────────
