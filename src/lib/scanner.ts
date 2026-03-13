@@ -111,11 +111,14 @@ export async function scanUrl(inputUrl: string): Promise<ScanResult> {
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
     );
 
-    // Navigate and wait for network to settle
+    // Navigate — use "load" (not networkidle2 which hangs on ad-heavy sites)
     await page.goto(url, {
-      waitUntil: "networkidle2",
+      waitUntil: "load",
       timeout: PAGE_TIMEOUT_MS,
     });
+
+    // Give JS a moment to render dynamic content
+    await new Promise((r) => setTimeout(r, 2000));
 
     // Inject axe-core into the page
     await page.addScriptTag({ content: axe.source });
