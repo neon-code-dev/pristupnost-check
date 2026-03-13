@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import PostHogProvider from "@/components/PostHogProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -72,7 +74,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen">
-        {children}
+        <Suspense fallback={null}>
+          <PostHogProvider>
+            {children}
+          </PostHogProvider>
+        </Suspense>
       </body>
     </html>
   );
