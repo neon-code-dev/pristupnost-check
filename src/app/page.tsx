@@ -371,7 +371,7 @@ export default function Home() {
                     <div className="code-snippet bg-red-50 border border-red-200 rounded-lg p-3 text-red-900">
                       &lt;h1&gt;Náš e-shop&lt;/h1&gt;<br />
                       &lt;h4&gt;Novinky&lt;/h4&gt;&nbsp;&nbsp;
-                      <span className="text-red-600">← přeskočeno h2, h3</span>
+                      <span className="text-red-700">← přeskočeno h2, h3</span>
                     </div>
                     <p className="text-xs text-slate-500 mt-2">Čtečka nerozumí struktuře. Zákazník neví, co je hlavní a co vedlejší.</p>
                   </div>
