@@ -105,8 +105,16 @@ export async function scanUrl(inputUrl: string): Promise<ScanResult> {
     pretendToBeVisual: true,
   });
 
+  // axe-core needs global window/document to function in Node.js
+  const prevWindow = globalThis.window;
+  const prevDocument = globalThis.document;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as any).window = dom.window;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as any).document = dom.window.document;
+
   try {
-    const results = await axe.run(dom.window.document, {
+    const results = await axe.run(dom.window.document.documentElement, {
       rules: {
         // Disable rules that don't work in jsdom
         "color-contrast": { enabled: false },
@@ -134,6 +142,21 @@ export async function scanUrl(inputUrl: string): Promise<ScanResult> {
       scanTimeMs: Date.now() - start,
     };
   } finally {
+    // Restore globals
+    if (prevWindow) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).window = prevWindow;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (globalThis as any).window;
+    }
+    if (prevDocument) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).document = prevDocument;
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (globalThis as any).document;
+    }
     dom.window.close();
   }
 }
