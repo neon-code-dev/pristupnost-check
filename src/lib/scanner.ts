@@ -63,15 +63,15 @@ function normalizeUrl(input: string): string {
 }
 
 function mapViolation(result: AxeRuleResult): ScanIssue {
-  const translation = getCzechTranslation(result.id);
+  const translation = getCzechTranslation(result.id, result.help, result.description);
 
   return {
     id: result.id,
     impact: (result.impact as ScanIssue["impact"]) || "moderate",
-    title: translation?.title || result.help,
-    description: translation?.description || result.description,
+    title: translation.title,
+    description: translation.description,
     helpUrl: result.helpUrl,
-    fix: translation?.fix || "",
+    fix: translation.fix,
     nodes: result.nodes.map((node) => ({
       html: node.html.length > 300 ? node.html.slice(0, 300) + "…" : node.html,
       target: node.target.join(", "),

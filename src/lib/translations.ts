@@ -4,458 +4,513 @@ interface RuleTranslation {
   fix: string;
 }
 
+// Překlady pravidel axe-core do češtiny.
+// Jazyk: srozumitelný pro majitele e-shopu, ne pro vývojáře.
+// Title = co je špatně. Description = proč to vadí uživatelům. Fix = co říct vývojáři.
+
 const translations: Record<string, RuleTranslation> = {
-  // Images
+  // ── Obrázky ──────────────────────────────────────────────
+
   "image-alt": {
-    title: "Obrázek nemá alternativní text (alt)",
+    title: "Obrázek nemá popisek",
     description:
-      "Každý obrázek musí mít atribut alt, který popisuje jeho obsah. Bez něj čtečky obrazovky obrázek přeskočí nebo přečtou název souboru.",
-    fix: "Přidejte atribut alt s popisem obsahu obrázku. U dekorativních obrázků použijte prázdný alt=\"\".",
+      "Na stránce je obrázek, ke kterému chybí textový popis. Nevidomý uživatel se čtečkou obrazovky neví, co obrázek zobrazuje — čtečka ho buď přeskočí, nebo přečte nesrozumitelný název souboru.",
+    fix: "Ke každému obrázku přidejte krátký popis toho, co zobrazuje (atribut alt). Pokud je obrázek jen dekorativní, nastavte prázdný popis.",
   },
   "image-redundant-alt": {
-    title: "Alt text obrázku opakuje okolní text",
+    title: "Popis obrázku zbytečně opakuje okolní text",
     description:
-      "Alt text obrázku by neměl opakovat text, který je už viditelný v okolí obrázku.",
-    fix: "Upravte alt text tak, aby doplňoval okolní kontext, ne ho opakoval.",
+      "Obrázek má stejný popis jako text vedle něj. Čtečka obrazovky pak přečte totéž dvakrát za sebou, což je otravné.",
+    fix: "Upravte popis obrázku tak, aby doplňoval to, co uživatel už vidí v textu kolem.",
   },
   "input-image-alt": {
-    title: "Obrázkové tlačítko nemá alternativní text",
+    title: "Obrázkové tlačítko nemá popis",
     description:
-      "Obrázkové vstupy (input type=\"image\") musí mít atribut alt popisující akci tlačítka.",
-    fix: "Přidejte atribut alt popisující, co tlačítko dělá.",
+      "Na stránce je tlačítko zobrazené jako obrázek, ale chybí mu textový popis. Nevidomý uživatel neví, co se stane když na tlačítko klikne.",
+    fix: "Přidejte k obrázkovému tlačítku textový popis jeho funkce (atribut alt).",
   },
   "role-img-alt": {
-    title: "Element s rolí obrázku nemá alt text",
+    title: "Grafický prvek nemá popis",
     description:
-      "Elementy s role=\"img\" musí mít přístupný název pomocí alt, aria-label nebo aria-labelledby.",
-    fix: "Přidejte aria-label nebo aria-labelledby k elementu s role=\"img\".",
+      "Na stránce je grafický prvek (ikona, ilustrace), který nemá žádný textový popis pro čtečky obrazovky.",
+    fix: "Přidejte textový popis ke grafickému prvku.",
   },
   "svg-img-alt": {
-    title: "SVG obrázek nemá přístupný název",
+    title: "Vektorová grafika (SVG) nemá popis",
     description:
-      "SVG elementy s role=\"img\" musí mít přístupný název.",
-    fix: "Přidejte element <title> dovnitř SVG nebo aria-label na SVG element.",
+      "Na stránce je vektorový obrázek nebo ikona bez textového popisu. Nevidomí uživatelé nevědí, co zobrazuje.",
+    fix: "Přidejte textový popis k SVG obrázku.",
   },
 
-  // Forms
+  // ── Formuláře ────────────────────────────────────────────
+
   label: {
-    title: "Formulářové pole nemá popisek (label)",
+    title: "Formulářové pole nemá popisek",
     description:
-      "Každé vstupní pole musí mít přiřazený label. Bez něj uživatel se čtečkou neví, co má do pole zadat.",
-    fix: "Přidejte element <label for=\"id-pole\"> nebo atribut aria-label k formulářovému poli.",
+      "Na stránce je vstupní pole (textové pole, zaškrtávací políčko, rozbalovací menu…), ale není k němu přiřazený popis. Uživatel se čtečkou neví, co má do pole zadat — slyší jen 'textové pole' bez dalšího vysvětlení.",
+    fix: "Ke každému formulářovému poli přidejte viditelný popisek, který říká co se má zadat.",
   },
   "select-name": {
-    title: "Výběrové pole (select) nemá popisek",
+    title: "Rozbalovací menu nemá popisek",
     description:
-      "Výběrové pole musí mít přiřazený label, aby bylo jasné co uživatel vybírá.",
-    fix: "Přidejte <label> element přiřazený k select poli.",
+      "Na stránce je rozbalovací výběr (select), ale není jasné, co si uživatel vybírá. Čtečka obrazovky přečte jen seznam položek bez kontextu.",
+    fix: "Přidejte viditelný popisek k rozbalovacímu menu.",
   },
   "input-button-name": {
-    title: "Vstupní tlačítko nemá přístupný text",
+    title: "Tlačítko nemá viditelný text",
     description:
-      "Tlačítka typu submit/reset/button musí mít viditelný text nebo value.",
-    fix: "Přidejte atribut value s popisem akce tlačítka.",
+      "Na stránce je tlačítko bez textu. Uživatel nevidí ani neslyší, co tlačítko dělá — může to být tlačítko pro odeslání objednávky, přihlášení nebo cokoliv jiného.",
+    fix: "Přidejte srozumitelný text do tlačítka, např. Odeslat, Přihlásit se.",
+  },
+  "form-field-multiple-labels": {
+    title: "Formulářové pole má víc popisků najednou",
+    description:
+      "K jednomu poli jsou přiřazeny dva nebo více různých popisků. Čtečka obrazovky neví, který z nich přečíst, a uživatel může být zmatený.",
+    fix: "Ponechte u každého pole jen jeden popisek.",
+  },
+  "autocomplete-valid": {
+    title: "Automatické doplňování formuláře nefunguje správně",
+    description:
+      "Pole formuláře má nesprávně nastavené automatické doplňování. Prohlížeč pak nemůže nabídnout uložené údaje (jméno, adresu, e-mail), a uživatel musí vše vyplňovat ručně.",
+    fix: "Opravte nastavení automatického doplňování (autocomplete) u formulářových polí.",
+  },
+  "label-content-name-mismatch": {
+    title: "Viditelný text prvku nesouhlasí s jeho přístupným názvem",
+    description:
+      "Prvek (tlačítko, odkaz) zobrazuje jiný text, než jaký slyší čtečka obrazovky. Uživatel hlasového ovládání řekne viditelný text, ale prohlížeč ho nerozpozná.",
+    fix: "Sjednoťte viditelný text s přístupným názvem prvku.",
   },
 
-  // Headings
+  // ── Nadpisy ──────────────────────────────────────────────
+
   "heading-order": {
     title: "Přeskočená úroveň nadpisu",
     description:
-      "Nadpisy musí jít postupně (h1 → h2 → h3). Přeskočení úrovně ztěžuje navigaci čtečkou obrazovky.",
-    fix: "Opravte hierarchii nadpisů — nepoužívejte h3 po h1 bez h2 mezi nimi.",
+      "Nadpisy na stránce nejdou popořadě — například po hlavním nadpisu (H1) následuje rovnou H3 místo H2. Pro nevidomé uživatele je to jako kniha, kde po kapitole 1 přeskočíte rovnou na podkapitolu 1.2 bez kapitoly 1.1.",
+    fix: "Seřaďte nadpisy postupně: H1 → H2 → H3. Nepřeskakujte úrovně.",
   },
   "page-has-heading-one": {
-    title: "Stránka nemá nadpis h1",
+    title: "Stránka nemá hlavní nadpis",
     description:
-      "Každá stránka by měla mít právě jeden nadpis h1, který popisuje hlavní obsah stránky.",
-    fix: "Přidejte na stránku jeden hlavní nadpis <h1>.",
+      "Stránce chybí hlavní nadpis (H1). Čtečka obrazovky ho používá jako první orientační bod — nevidomý uživatel neví, na jaké stránce se nachází.",
+    fix: "Přidejte na stránku jeden hlavní nadpis (H1), který vystihuje obsah stránky.",
   },
   "empty-heading": {
     title: "Prázdný nadpis",
     description:
-      "Nadpis bez textu je pro čtečky matoucí — čtečka oznámí úroveň nadpisu, ale nepřečte žádný obsah.",
-    fix: "Přidejte text do nadpisu, nebo ho odstraňte pokud není potřeba.",
+      "Na stránce je nadpis, který neobsahuje žádný text. Čtečka obrazovky oznámí nadpis úrovně 2, ale nepřečte nic — uživatel neví, o čem sekce je.",
+    fix: "Přidejte text do nadpisu, nebo ho úplně odstraňte pokud není potřeba.",
+  },
+  "p-as-heading": {
+    title: "Text vypadá jako nadpis, ale technicky jím není",
+    description:
+      "Na stránce je tučný nebo velký text, který vypadá jako nadpis, ale v kódu stránky je označený jako běžný odstavec. Čtečka obrazovky ho jako nadpis nerozpozná, takže nevidomý uživatel nemůže skákat mezi sekcemi.",
+    fix: "Použijte správný nadpisový prvek (H2, H3…) místo tučného odstavce.",
   },
 
-  // Document
+  // ── Nastavení stránky ────────────────────────────────────
+
   "html-has-lang": {
     title: "Stránka nemá nastavený jazyk",
     description:
-      "Element <html> musí mít atribut lang (např. lang=\"cs\"). Bez něj čtečka neví jakým jazykem číst.",
-    fix: "Přidejte lang=\"cs\" na element <html>.",
+      "Stránka neříká prohlížeči, v jakém je jazyku. Čtečka obrazovky pak může číst český text anglickým hlasem, což je nesrozumitelné.",
+    fix: "V kódu stránky nastavte jazyk na češtinu (lang='cs').",
   },
   "html-lang-valid": {
-    title: "Neplatná hodnota atributu lang",
-    description: "Atribut lang musí obsahovat platný kód jazyka.",
-    fix: "Použijte platný kód jazyka, např. \"cs\" pro češtinu, \"sk\" pro slovenštinu.",
+    title: "Nastavení jazyka stránky je neplatné",
+    description:
+      "Stránka má nastavený jazyk, ale hodnota je chybná — prohlížeč ji nerozpozná. Čtečka obrazovky pak použije výchozí jazyk místo správného.",
+    fix: "Opravte kód jazyka na platnou hodnotu — cs pro češtinu, sk pro slovenštinu.",
   },
   "document-title": {
-    title: "Stránka nemá titulek (title)",
+    title: "Stránka nemá titulek",
     description:
-      "Každá stránka musí mít element <title>. Titulek se zobrazuje v záložce prohlížeče a čtečky ho čtou jako první.",
-    fix: "Přidejte <title> element do <head> stránky s výstižným popisem obsahu.",
+      "Stránce chybí titulek — ten text, který vidíte v záložce prohlížeče. Uživatel čtečky ho slyší jako první informaci po otevření stránky. Bez titulku neví, co stránka obsahuje.",
+    fix: "Přidejte výstižný titulek stránky, např. Košík — MůjObchod.cz.",
   },
   "html-xml-lang-mismatch": {
-    title: "Nesoulad atributů lang a xml:lang",
+    title: "Nesoulad v nastavení jazyka stránky",
     description:
-      "Pokud element html má oba atributy lang a xml:lang, musí mít stejnou hodnotu.",
-    fix: "Sjednoťte hodnoty atributů lang a xml:lang.",
+      "Stránka má dva různé údaje o jazyku, které si odporují. Čtečka neví, kterému věřit.",
+    fix: "Sjednoťte oba údaje o jazyku stránky na stejnou hodnotu.",
   },
   "valid-lang": {
-    title: "Neplatný kód jazyka na elementu",
-    description: "Atribut lang na elementu obsahuje neplatný kód jazyka.",
-    fix: "Opravte kód jazyka na platnou hodnotu (např. cs, sk, en).",
+    title: "Neplatný kód jazyka",
+    description:
+      "Část stránky má přiřazený jazyk, ale jeho kód je chybný. Čtečka obrazovky přečte text špatným hlasem.",
+    fix: "Opravte kód jazyka na platnou hodnotu (cs, sk, en…).",
   },
 
-  // Links & Buttons
+  // ── Odkazy a tlačítka ────────────────────────────────────
+
   "link-name": {
-    title: "Odkaz nemá přístupný text",
+    title: "Odkaz nemá srozumitelný text",
     description:
-      "Odkaz musí mít viditelný text nebo aria-label, aby uživatel věděl kam ho odkaz zavede.",
-    fix: "Přidejte text do odkazu, nebo použijte aria-label pokud odkaz obsahuje jen obrázek.",
+      "Na stránce je odkaz, který nemá žádný text — může to být prázdný odkaz nebo odkaz obsahující jen obrázek bez popisu. Uživatel čtečky slyší odkaz, ale netuší, kam vede.",
+    fix: "Přidejte srozumitelný text do odkazu. Pokud odkaz obsahuje jen obrázek, přidejte k obrázku popis.",
   },
   "button-name": {
-    title: "Tlačítko nemá přístupný text",
+    title: "Tlačítko nemá srozumitelný text",
     description:
-      "Tlačítko musí mít viditelný text nebo aria-label, aby uživatel věděl co tlačítko dělá.",
-    fix: "Přidejte text do tlačítka, nebo přidejte aria-label.",
+      "Na stránce je tlačítko bez textu — může to být ikonové tlačítko (křížek, hamburger menu, šipka). Uživatel čtečky slyší tlačítko, ale neví, co udělá.",
+    fix: "Přidejte text do tlačítka. U ikonových tlačítek přidejte skrytý textový popis.",
   },
   "link-in-text-block": {
-    title: "Odkaz v textu nelze vizuálně rozlišit",
+    title: "Odkaz v textu je rozlišený jen barvou",
     description:
-      "Odkazy v textu musí být rozlišitelné nejen barvou (např. podtržením).",
-    fix: "Přidejte podtržení nebo jiný vizuální indikátor odkazů mimo barvy.",
+      "Odkaz v textu je odlišený pouze barvou písma, bez podtržení. Barvoslepí uživatelé (až 8 % mužů) odkaz v textu nerozliší.",
+    fix: "Přidejte k odkazům podtržení nebo jiný vizuální odlišovač kromě barvy.",
   },
 
-  // Tables
-  "td-headers-attr": {
-    title: "Buňka tabulky nemá správné záhlaví",
-    description:
-      "Atribut headers v buňce tabulky musí odkazovat na existující záhlaví.",
-    fix: "Opravte atribut headers tak, aby odpovídal ID záhlaví tabulky.",
-  },
-  "th-has-data-cells": {
-    title: "Záhlaví tabulky nemá přiřazené datové buňky",
-    description:
-      "Každé záhlaví tabulky (th) musí být spojeno s datovými buňkami.",
-    fix: "Zajistěte, aby záhlaví odpovídalo sloupcům nebo řádkům s daty.",
-  },
-  "scope-attr-valid": {
-    title: "Neplatný atribut scope v záhlaví tabulky",
-    description:
-      "Atribut scope musí mít hodnotu row, col, rowgroup nebo colgroup.",
-    fix: "Opravte hodnotu atributu scope na jednu z povolených.",
-  },
+  // ── Barevný kontrast ─────────────────────────────────────
 
-  // ARIA
-  "aria-allowed-attr": {
-    title: "Nepovolený ARIA atribut",
-    description: "Element používá ARIA atribut, který není povolený pro jeho roli.",
-    fix: "Odstraňte nepovolený ARIA atribut nebo změňte roli elementu.",
-  },
-  "aria-hidden-body": {
-    title: "Element body má aria-hidden=\"true\"",
-    description:
-      "Pokud má body aria-hidden=\"true\", celá stránka je skrytá pro asistenční technologie.",
-    fix: "Odstraňte aria-hidden=\"true\" z elementu body.",
-  },
-  "aria-required-attr": {
-    title: "Chybějící povinný ARIA atribut",
-    description:
-      "Element s ARIA rolí nemá všechny povinné atributy pro danou roli.",
-    fix: "Přidejte chybějící povinné ARIA atributy.",
-  },
-  "aria-required-children": {
-    title: "ARIA element nemá povinné potomky",
-    description:
-      "Některé ARIA role vyžadují specifické potomky (např. list vyžaduje listitem).",
-    fix: "Přidejte požadované potomky, nebo opravte ARIA roli.",
-  },
-  "aria-required-parent": {
-    title: "ARIA element nemá povinného rodiče",
-    description:
-      "Některé ARIA role musí být uvnitř specifického rodičovského elementu.",
-    fix: "Umístěte element do správného rodičovského kontejneru.",
-  },
-  "aria-valid-attr": {
-    title: "Neplatný ARIA atribut",
-    description: "Element používá ARIA atribut, který neexistuje.",
-    fix: "Odstraňte neplatný ARIA atribut nebo ho opravte na správný název.",
-  },
-  "aria-valid-attr-value": {
-    title: "Neplatná hodnota ARIA atributu",
-    description: "ARIA atribut má hodnotu, která není povolená.",
-    fix: "Opravte hodnotu ARIA atributu na jednu z povolených.",
-  },
-  "aria-roles": {
-    title: "Neplatná ARIA role",
-    description: "Element má ARIA roli, která neexistuje.",
-    fix: "Opravte roli na platnou hodnotu nebo ji odstraňte.",
-  },
-
-  // Navigation & Structure
-  bypass: {
-    title: "Chybí možnost přeskočit navigaci",
-    description:
-      "Stránka musí mít odkaz \"Přeskočit na obsah\" nebo landmark oblasti, aby uživatel klávesnice mohl přeskočit opakující se navigaci.",
-    fix: "Přidejte odkaz \"Přeskočit na hlavní obsah\" na začátek stránky, nebo použijte HTML5 landmark elementy (main, nav, header).",
-  },
-  region: {
-    title: "Obsah mimo landmark oblast",
-    description:
-      "Veškerý obsah stránky by měl být uvnitř landmark oblastí (header, nav, main, footer).",
-    fix: "Obalte obsah do odpovídajících landmark elementů (<main>, <nav>, <header>, <footer>).",
-  },
-  landmark: {
-    title: "Stránka nemá landmark oblasti",
-    description:
-      "Stránka by měla používat landmark elementy pro snadnou navigaci čtečkou.",
-    fix: "Přidejte landmark elementy: <header>, <nav>, <main>, <footer>.",
-  },
-  "landmark-one-main": {
-    title: "Stránka nemá element <main>",
-    description:
-      "Každá stránka musí mít právě jeden element <main>, který označuje hlavní obsah.",
-    fix: "Přidejte element <main> kolem hlavního obsahu stránky.",
-  },
-
-  // Lists
-  "definition-list": {
-    title: "Nesprávná struktura definiční seznamu",
-    description: "Element <dl> smí obsahovat pouze <dt> a <dd> elementy.",
-    fix: "Opravte strukturu definiční seznamu — uvnitř <dl> mohou být jen <dt> a <dd>.",
-  },
-  dlitem: {
-    title: "Element <dt>/<dd> není uvnitř <dl>",
-    description: "Elementy <dt> a <dd> musí být uvnitř <dl>.",
-    fix: "Umístěte <dt>/<dd> dovnitř elementu <dl>.",
-  },
-  list: {
-    title: "Nesprávná struktura seznamu",
-    description: "Elementy <ul> a <ol> smí obsahovat pouze <li>, <script> nebo <template>.",
-    fix: "Opravte strukturu seznamu — uvnitř <ul>/<ol> mohou být jen <li> elementy.",
-  },
-  listitem: {
-    title: "Element <li> není uvnitř seznamu",
-    description: "Element <li> musí být uvnitř <ul>, <ol> nebo <menu>.",
-    fix: "Umístěte <li> dovnitř <ul>, <ol> nebo <menu>.",
-  },
-
-  // Multimedia
-  "video-caption": {
-    title: "Video nemá titulky",
-    description: "Videa musí mít titulky pro neslyšící uživatele.",
-    fix: "Přidejte titulky (captions) k videu pomocí elementu <track>.",
-  },
-  "audio-caption": {
-    title: "Audio nemá textový přepis",
-    description:
-      "Audio obsah musí mít textový přepis nebo titulky.",
-    fix: "Přidejte textový přepis audio obsahu.",
-  },
-
-  // Color contrast
   "color-contrast": {
     title: "Nedostatečný barevný kontrast textu",
     description:
-      "Barva textu nemá dostatečný kontrast vůči pozadí. Uživatelé se slabým zrakem text špatně přečtou. WCAG 2.1 AA vyžaduje poměr minimálně 4.5:1 pro běžný text a 3:1 pro velký text.",
-    fix: "Zvyšte kontrast — buď ztmavěte text, nebo zesvětlete pozadí. Použijte nástroj jako WebAIM Contrast Checker.",
+      "Text na stránce je špatně čitelný — barva písma je příliš podobná barvě pozadí. Lidé se slabým zrakem, starší uživatelé nebo kdokoli na slunci na mobilu text nepřečte.",
+    fix: "Ztmavěte barvu textu nebo zesvětlete pozadí. Minimální kontrastní poměr je 4.5:1 pro běžný text. Ověřte nástrojem WebAIM Contrast Checker.",
   },
   "color-contrast-enhanced": {
-    title: "Barevný kontrast nesplňuje vyšší úroveň AAA",
+    title: "Barevný kontrast textu nesplňuje vyšší standard",
     description:
-      "Text nesplňuje přísnější požadavky WCAG AAA na kontrastní poměr (7:1 pro běžný text).",
-    fix: "Zvyšte kontrast na poměr minimálně 7:1 pro běžný text.",
+      "Text sice projde základní kontrolou kontrastu, ale nesplňuje přísnější požadavky pro maximální čitelnost.",
+    fix: "Zvyšte kontrastní poměr na 7:1 pro běžný text.",
   },
 
-  // Target size (WCAG 2.2)
+  // ── Velikost klikacích cílů (WCAG 2.2) ──────────────────
+
   "target-size": {
-    title: "Klikací cíl je příliš malý",
+    title: "Klikací prvek je příliš malý",
     description:
-      "Interaktivní prvek (odkaz, tlačítko) má menší klikací plochu než 24×24 pixelů. Uživatelé s motorickým postižením nebo na mobilech ho těžko trefí.",
-    fix: "Zvětšete klikací plochu na minimálně 24×24 px pomocí paddingu nebo min-width/min-height.",
+      "Odkaz nebo tlačítko má příliš malou klikací plochu. Na mobilu se těžko trefí prstem, a lidé s třesem rukou nebo motorickým postižením mohou kliknout vedle.",
+    fix: "Zvětšete klikací plochu tlačítek a odkazů na minimálně 24×24 pixelů.",
   },
 
-  // Focus
-  "focus-order-semantics": {
-    title: "Element v pořadí fokusu nemá interaktivní roli",
+  // ── Tabulky ──────────────────────────────────────────────
+
+  "td-headers-attr": {
+    title: "Tabulka nemá správně propojená záhlaví",
     description:
-      "Element, který přijímá fokus klávesnicí, by měl mít interaktivní roli (odkaz, tlačítko apod.).",
-    fix: "Přidejte odpovídající roli, nebo odstraňte tabindex pokud element nemá být interaktivní.",
+      "Datová tabulka nemá správně propojené buňky se záhlavím. Čtečka obrazovky pak neřekne uživateli, ke kterému sloupci hodnota patří — slyší jen čísla bez kontextu.",
+    fix: "Propojte buňky tabulky se záhlavím sloupců/řádků.",
+  },
+  "th-has-data-cells": {
+    title: "Záhlaví tabulky nemá přiřazená data",
+    description:
+      "V tabulce je záhlaví sloupce nebo řádku, ale nejsou k němu přiřazené žádné datové buňky. To je matoucí pro čtečky obrazovky.",
+    fix: "Opravte strukturu tabulky — každé záhlaví musí odpovídat sloupcům nebo řádkům s daty.",
+  },
+  "scope-attr-valid": {
+    title: "Nesprávné nastavení záhlaví tabulky",
+    description:
+      "Záhlaví tabulky má chybné nastavení směru — prohlížeč neví, jestli patří ke sloupci nebo řádku.",
+    fix: "Opravte nastavení záhlaví tabulky (atribut scope).",
   },
 
-  // Autocomplete
-  "autocomplete-valid": {
-    title: "Neplatná hodnota atributu autocomplete",
+  // ── ARIA (přístupnostní značky) ──────────────────────────
+
+  "aria-allowed-attr": {
+    title: "Nesprávně použitá přístupnostní značka",
     description:
-      "Atribut autocomplete musí mít správnou hodnotu odpovídající typu pole (např. name, email, tel).",
-    fix: "Opravte hodnotu autocomplete na platnou — např. autocomplete=\"email\" pro emailové pole.",
+      "Prvek na stránce má přístupnostní značku (ARIA), která k němu nepatří. Čtečka obrazovky může předat uživateli zavádějící informaci.",
+    fix: "Odstraňte nesprávnou přístupnostní značku z prvku.",
+  },
+  "aria-hidden-body": {
+    title: "Celá stránka je skrytá pro čtečky obrazovky",
+    description:
+      "Stránka je označená jako skrytá pro asistenční technologie. Nevidomý uživatel neuvidí vůbec nic — jako by stránka neexistovala.",
+    fix: "Odstraňte označení aria-hidden z hlavního prvku stránky (body).",
+  },
+  "aria-required-attr": {
+    title: "Přístupnostní značka je nekompletní",
+    description:
+      "Prvek má přístupnostní značku (ARIA roli), ale chybí jí povinné doplňující informace. Čtečka dostane neúplné údaje.",
+    fix: "Doplňte chybějící povinné přístupnostní údaje k prvku.",
+  },
+  "aria-required-children": {
+    title: "Přístupnostní prvek nemá požadovaný obsah",
+    description:
+      "Prvek označený speciální rolí (např. seznam) neobsahuje požadované podprvky (položky seznamu). Čtečka oznámí seznam, ale nenajde žádné položky.",
+    fix: "Přidejte požadované podprvky, nebo opravte roli prvku.",
+  },
+  "aria-required-parent": {
+    title: "Přístupnostní prvek je na špatném místě",
+    description:
+      "Prvek (např. položka seznamu) není umístěný uvnitř správného nadřazeného prvku (seznamu). Čtečka ho nemusí správně interpretovat.",
+    fix: "Přesuňte prvek do správného nadřazeného kontejneru.",
+  },
+  "aria-valid-attr": {
+    title: "Neexistující přístupnostní značka",
+    description:
+      "Prvek používá přístupnostní značku, která neexistuje — pravděpodobně překlep v kódu. Čtečka ji ignoruje.",
+    fix: "Opravte název přístupnostní značky (ARIA atributu).",
+  },
+  "aria-valid-attr-value": {
+    title: "Neplatná hodnota přístupnostní značky",
+    description:
+      "Přístupnostní značka má hodnotu, kterou čtečka nerozumí. Informace se k uživateli nedostane.",
+    fix: "Opravte hodnotu přístupnostní značky na platnou.",
+  },
+  "aria-roles": {
+    title: "Neplatná role prvku",
+    description:
+      "Prvek na stránce má přiřazenou roli, která neexistuje. Čtečka obrazovky neví, jak prvek popsat uživateli.",
+    fix: "Opravte roli prvku na platnou hodnotu, nebo ji odstraňte.",
   },
 
-  // Duplicate ID
-  "duplicate-id-aria": {
-    title: "Duplicitní ID odkazované z ARIA",
-    description:
-      "Více elementů má stejné ID, na které odkazuje ARIA atribut (aria-labelledby, aria-describedby). Čtečka pak přečte špatný text.",
-    fix: "Opravte duplicitní ID tak, aby bylo unikátní.",
-  },
+  // ── Navigace a struktura stránky ─────────────────────────
 
-  // Nested interactive
-  "nested-interactive": {
-    title: "Vnořené interaktivní prvky",
+  bypass: {
+    title: "Chybí možnost přeskočit navigaci",
     description:
-      "Interaktivní prvek (tlačítko, odkaz) je uvnitř jiného interaktivního prvku. To je matoucí pro klávesnici i čtečky.",
-    fix: "Oddělte vnořené prvky — odkaz nesmí být uvnitř tlačítka a naopak.",
+      "Na stránce chybí odkaz Přeskočit na obsah. Uživatel klávesnice musí při každém načtení stránky projít tabulátorem přes celé menu, než se dostane k obsahu. Představte si, že při každém kliknutí musíte přečíst celé menu znovu.",
+    fix: "Přidejte na začátek stránky skrytý odkaz Přeskočit na hlavní obsah.",
   },
-
-  // Scrollable region
-  "scrollable-region-focusable": {
-    title: "Scrollovatelná oblast není přístupná klávesnicí",
+  region: {
+    title: "Obsah stránky není rozčleněný do oblastí",
     description:
-      "Oblast s posuvníkem musí být ovladatelná klávesnicí, jinak se uživatel bez myši k obsahu nedostane.",
-    fix: "Přidejte tabindex=\"0\" a role=\"region\" s aria-label na scrollovatelný kontejner.",
+      "Obsah stránky není rozčleněný do oblastí (záhlaví, navigace, hlavní obsah, patička). Nevidomý uživatel nemůže rychle přeskočit na konkrétní část stránky — musí projít všechno od začátku.",
+    fix: "Rozčleňte stránku do oblastí: záhlaví (header), navigace (nav), hlavní obsah (main), patička (footer).",
   },
-
-  // Landmarks
+  landmark: {
+    title: "Stránka nemá navigační oblasti",
+    description:
+      "Stránka nepoužívá navigační oblasti (landmarky). Nevidomý uživatel nemůže rychle přeskočit na menu, obsah nebo patičku.",
+    fix: "Přidejte na stránku oblasti: záhlaví, navigaci, hlavní obsah a patičku.",
+  },
+  "landmark-one-main": {
+    title: "Stránka nemá označený hlavní obsah",
+    description:
+      "Stránka nemá vyznačenou oblast s hlavním obsahem. Čtečka obrazovky neumí uživatele přesměrovat rovnou na to podstatné.",
+    fix: "Označte hlavní obsah stránky prvkem <main>.",
+  },
   "landmark-banner-is-top-level": {
-    title: "Banner (header) není na nejvyšší úrovni",
-    description: "Element s rolí banner musí být přímý potomek body, ne vnořený v jiném landmarku.",
-    fix: "Přesuňte <header> na nejvyšší úroveň stránky.",
+    title: "Záhlaví stránky je na špatném místě v kódu",
+    description:
+      "Záhlaví stránky (banner) je vnořené uvnitř jiné oblasti, místo aby bylo na nejvyšší úrovni. Čtečka ho nemusí správně najít.",
+    fix: "Přesuňte záhlaví stránky na nejvyšší úroveň.",
   },
   "landmark-contentinfo-is-top-level": {
-    title: "Contentinfo (footer) není na nejvyšší úrovni",
-    description: "Element s rolí contentinfo musí být přímý potomek body.",
-    fix: "Přesuňte <footer> na nejvyšší úroveň stránky.",
+    title: "Patička stránky je na špatném místě v kódu",
+    description:
+      "Patička stránky je vnořená uvnitř jiné oblasti, místo aby byla na nejvyšší úrovni. Čtečka ji nemusí správně najít.",
+    fix: "Přesuňte patičku stránky na nejvyšší úroveň.",
   },
   "landmark-main-is-top-level": {
-    title: "Main není na nejvyšší úrovni",
-    description: "Element <main> musí být přímý potomek body, ne vnořený v jiném landmarku.",
-    fix: "Přesuňte <main> na nejvyšší úroveň stránky.",
+    title: "Hlavní obsah je na špatném místě v kódu",
+    description:
+      "Oblast hlavního obsahu je vnořená uvnitř jiné oblasti. Čtečka ji nemusí správně identifikovat.",
+    fix: "Přesuňte hlavní obsah na nejvyšší úroveň stránky.",
   },
   "landmark-no-duplicate-banner": {
-    title: "Stránka má více bannerů (header)",
-    description: "Na stránce by měl být jen jeden element s rolí banner.",
-    fix: "Ponechte jen jeden <header> s rolí banner.",
+    title: "Stránka má víc záhlaví",
+    description:
+      "Na stránce je víc než jedno záhlaví (banner). Čtečka neví, které je to hlavní.",
+    fix: "Ponechte na stránce jen jedno záhlaví.",
   },
   "landmark-no-duplicate-contentinfo": {
-    title: "Stránka má více patičkových oblastí",
-    description: "Na stránce by měl být jen jeden element s rolí contentinfo.",
-    fix: "Ponechte jen jeden <footer> s rolí contentinfo.",
+    title: "Stránka má víc patiček",
+    description:
+      "Na stránce je víc než jedna patička. Čtečka neví, která je ta hlavní.",
+    fix: "Ponechte na stránce jen jednu patičku.",
   },
   "landmark-no-duplicate-main": {
-    title: "Stránka má více elementů <main>",
-    description: "Na stránce musí být jen jeden element <main>.",
-    fix: "Ponechte jen jeden <main> element.",
+    title: "Stránka má víc oblastí hlavního obsahu",
+    description:
+      "Na stránce je víc než jedna oblast hlavního obsahu. Čtečka neví, kde začíná to podstatné.",
+    fix: "Ponechte na stránce jen jednu oblast hlavního obsahu.",
   },
   "landmark-unique": {
-    title: "Landmark oblasti nejsou unikátní",
+    title: "Oblasti stránky nejsou rozlišené",
     description:
-      "Pokud stránka má více landmarků stejného typu (např. dva <nav>), musí mít unikátní aria-label.",
-    fix: "Přidejte aria-label k duplicitním landmarkům, např. aria-label=\"Hlavní navigace\".",
+      "Stránka má víc oblastí stejného typu (např. dvě navigace), ale nejsou pojmenované. Čtečka řekne navigace dvakrát a uživatel neví, která je hlavní a která vedlejší.",
+    fix: "Pojmenujte duplicitní oblasti — např. Hlavní navigace a Navigace v patičce.",
   },
 
-  // Forms additional
-  "form-field-multiple-labels": {
-    title: "Formulářové pole má více popisků",
-    description: "Pole má přiřazeno více <label> elementů, což je matoucí pro čtečky.",
-    fix: "Ponechte jen jeden <label> pro každé pole.",
-  },
-  "label-content-name-mismatch": {
-    title: "Viditelný text nesouhlasí s přístupným názvem",
+  // ── Seznamy ──────────────────────────────────────────────
+
+  "definition-list": {
+    title: "Nesprávná struktura výkladového seznamu",
     description:
-      "Text viditelný na obrazovce se liší od přístupného názvu (aria-label). Uživatelé hlasového ovládání pak prvek nenajdou.",
-    fix: "Sjednoťte aria-label s viditelným textem, nebo aria-label úplně odstraňte.",
+      "Výkladový seznam (termín + vysvětlení) obsahuje prvky, které tam nepatří. Čtečka obrazovky špatně rozpozná, co je termín a co vysvětlení.",
+    fix: "Opravte strukturu výkladového seznamu v kódu stránky.",
   },
-
-  // Objects & Embeds
-  "object-alt": {
-    title: "Element <object> nemá alternativní text",
-    description: "Vložený objekt musí mít přístupný název pro čtečky obrazovky.",
-    fix: "Přidejte aria-label nebo textový obsah dovnitř <object> elementu.",
-  },
-  "area-alt": {
-    title: "Element <area> v image map nemá alt text",
-    description: "Klikací oblasti v obrázkové mapě musí mít atribut alt.",
-    fix: "Přidejte atribut alt popisující, kam odkaz vede.",
-  },
-
-  // Iframe
-  "frame-focusable-content": {
-    title: "Iframe s focusovatelným obsahem nemá přístupný název",
-    description: "Iframe, který obsahuje interaktivní prvky, musí mít atribut title.",
-    fix: "Přidejte atribut title na element <iframe>.",
-  },
-  "frame-title-unique": {
-    title: "Iframe nemá unikátní titulek",
-    description: "Pokud stránka obsahuje více iframe, každý musí mít odlišný title.",
-    fix: "Upravte titulky iframe tak, aby se navzájem lišily.",
-  },
-
-  // Orientation & responsivity
-  "css-orientation-lock": {
-    title: "Obsah je uzamčen na jednu orientaci",
+  dlitem: {
+    title: "Termín nebo vysvětlení je mimo seznam",
     description:
-      "Stránka nesmí vynutit orientaci displeje (portrait/landscape). Uživatel na vozíku může mít tablet připevněný na pevno.",
-    fix: "Odstraňte CSS pravidla, která vynucují orientaci přes @media (orientation).",
+      "Termín nebo jeho vysvětlení jsou umístěné mimo výkladový seznam. Čtečka je neinterpretuje jako součást seznamu.",
+    fix: "Přesuňte termín a vysvětlení dovnitř výkladového seznamu.",
+  },
+  list: {
+    title: "Nesprávná struktura seznamu",
+    description:
+      "Seznam obsahuje prvky, které tam nepatří. Čtečka obrazovky oznámí počet položek seznamu špatně.",
+    fix: "Opravte strukturu seznamu — smí obsahovat pouze položky seznamu.",
+  },
+  listitem: {
+    title: "Položka seznamu je mimo seznam",
+    description:
+      "Na stránce je položka seznamu, která není uvnitř seznamu. Čtečka ji neoznačí jako součást seznamu.",
+    fix: "Přesuňte položku dovnitř seznamu.",
   },
 
-  // Autoplay
+  // ── Multimédia ───────────────────────────────────────────
+
+  "video-caption": {
+    title: "Video nemá titulky",
+    description:
+      "Video na stránce nemá titulky. Neslyšící uživatelé a lidé v hlučném prostředí se nedozvědí, co se ve videu říká.",
+    fix: "Přidejte k videu titulky (české, případně i české znakové).",
+  },
+  "audio-caption": {
+    title: "Zvukový záznam nemá textový přepis",
+    description:
+      "Zvukový záznam nemá textovou verzi. Neslyšící uživatelé se nedozvědí jeho obsah.",
+    fix: "Přidejte textový přepis zvukového záznamu.",
+  },
   "no-autoplay-audio": {
-    title: "Audio se přehrává automaticky",
+    title: "Zvuk se přehrává automaticky",
     description:
-      "Automaticky přehrávané audio delší než 3 sekundy musí jít pozastavit nebo ztlumit.",
-    fix: "Přidejte ovládací prvky pro pozastavení/ztlumení, nebo odstraňte autoplay.",
+      "Na stránce se automaticky přehrává zvuk. Uživatel čtečky obrazovky neslyší čtečku přes automaticky hrající zvuk a nemůže stránku ovládat.",
+    fix: "Vypněte automatické přehrávání, nebo přidejte tlačítko pro zastavení/ztlumení.",
   },
 
-  // Typography & semantic
-  "p-as-heading": {
-    title: "Tučný odstavec použitý místo nadpisu",
-    description:
-      "Text vypadá jako nadpis (velký/tučný), ale je označený jako odstavec <p>. Čtečky ho nerozpoznají jako nadpis.",
-    fix: "Použijte správný nadpisový element (<h2>, <h3>...) místo tučného odstavce.",
-  },
+  // ── Barevný kontrast a vizuální stránka ──────────────────
 
-  // Other common
   "meta-viewport": {
-    title: "Meta viewport zakazuje zvětšení stránky",
+    title: "Stránka zakazuje zvětšení (zoom)",
     description:
-      "Uživatelé musí mít možnost stránku přiblížit (zoom). Atribut maximum-scale nebo user-scalable=no jim to brání.",
-    fix: "Odstraňte maximum-scale a user-scalable=no z meta viewport tagu.",
+      "Stránka nedovoluje uživatelům přiblížit obsah. Lidé se slabým zrakem si nemohou text zvětšit a na stránce nic nepřečtou.",
+    fix: "Povolte zvětšování stránky — odstraňte omezení zoomu z nastavení viewportu.",
   },
   "meta-refresh": {
-    title: "Stránka se automaticky přesměrovává nebo obnovuje",
+    title: "Stránka se sama přesměrovává nebo obnovuje",
     description:
-      "Meta refresh je problematický pro uživatele se čtečkami — stránka se jim změní pod rukama.",
-    fix: "Odstraňte meta refresh a použijte serverové přesměrování (HTTP 301/302).",
+      "Stránka se automaticky obnovuje nebo přesměrovává. Uživatel čtečky nestihne přečíst obsah, než se stránka změní.",
+    fix: "Zrušte automatické obnovování stránky.",
   },
+  "css-orientation-lock": {
+    title: "Stránka vyžaduje konkrétní orientaci obrazovky",
+    description:
+      "Stránka funguje jen na výšku nebo jen na šířku. Uživatel na vozíku může mít tablet připevněný napevno a nemůže ho otočit.",
+    fix: "Zajistěte, aby stránka fungovala v obou orientacích (na výšku i na šířku).",
+  },
+
+  // ── Klávesnice a fokus ───────────────────────────────────
+
   tabindex: {
-    title: "Prvek má tabindex větší než 0",
+    title: "Nesprávné pořadí procházení klávesnicí",
     description:
-      "Tabindex s hodnotou vyšší než 0 mění přirozené pořadí navigace klávesnicí a je matoucí.",
-    fix: "Použijte tabindex=\"0\" nebo tabindex=\"-1\" místo kladných hodnot.",
+      "Prvek na stránce mění přirozené pořadí, ve kterém se uživatel pohybuje klávesou Tab. Kurzor pak skáče na neočekávaná místa.",
+    fix: "Odstraňte vlastní pořadí procházení (tabindex s kladným číslem).",
   },
-  "duplicate-id": {
-    title: "Duplicitní ID na stránce",
+  "focus-order-semantics": {
+    title: "Neinteraktivní prvek přijímá fokus klávesnice",
     description:
-      "Atribut id musí být na stránce unikátní. Duplicitní ID způsobuje problémy s label přiřazením a ARIA referencemi.",
-    fix: "Přejmenujte duplicitní ID tak, aby každé bylo unikátní.",
+      "Prvek, na který se dá přejít tabulátorem, nepůsobí jako tlačítko ani odkaz. Uživatel na něj přejde, ale neví co s ním dělat.",
+    fix: "Buď prvek označte jako interaktivní (tlačítko/odkaz), nebo mu odeberte možnost fokusu.",
+  },
+  "nested-interactive": {
+    title: "Klikací prvek je uvnitř jiného klikacího prvku",
+    description:
+      "Na stránce je odkaz uvnitř tlačítka (nebo naopak). Uživatel klávesnice neví, co se stane po kliknutí — aktivuje se vnější nebo vnitřní prvek?",
+    fix: "Oddělte vnořené klikací prvky — odkaz nesmí být uvnitř tlačítka.",
+  },
+  "scrollable-region-focusable": {
+    title: "Posuvná oblast nejde ovládat klávesnicí",
+    description:
+      "Na stránce je oblast s posuvníkem (scrollbar), ke které se nedá dostat klávesnicí. Uživatel bez myši se k obsahu uvnitř nedostane.",
+    fix: "Nastavte posuvnou oblast tak, aby byla dostupná přes klávesnici.",
+  },
+
+  // ── Duplicitní prvky ─────────────────────────────────────
+
+  "duplicate-id": {
+    title: "Duplicitní identifikátor na stránce",
+    description:
+      "Dva nebo více prvků na stránce mají stejný identifikátor (ID). Prohlížeč pak může přiřadit popisek nebo přístupnostní značku k nesprávnému prvku.",
+    fix: "Opravte identifikátory tak, aby byl každý unikátní.",
   },
   "duplicate-id-active": {
-    title: "Duplicitní ID na aktivním prvku",
+    title: "Duplicitní identifikátor na klikacím prvku",
     description:
-      "Aktivní prvky (tlačítka, odkazy, formulářová pole) s duplicitním ID způsobují chyby asistenčních technologií.",
-    fix: "Opravte ID aktivních prvků tak, aby byla unikátní.",
+      "Dvě tlačítka, odkazy nebo formulářová pole mají stejný identifikátor. Čtečka obrazovky může přiřadit popis jednoho prvku k druhému.",
+    fix: "Opravte identifikátory klikacích prvků tak, aby byly unikátní.",
   },
-  "frame-title": {
-    title: "Iframe nemá titulek",
+  "duplicate-id-aria": {
+    title: "Duplicitní identifikátor v přístupnostní značce",
     description:
-      "Každý iframe musí mít atribut title popisující jeho obsah.",
-    fix: "Přidejte atribut title na element <iframe>.",
+      "Přístupnostní značka odkazuje na identifikátor, který mají dva různé prvky. Čtečka přečte text ze špatného prvku.",
+    fix: "Opravte duplicitní identifikátory.",
+  },
+
+  // ── Vložený obsah (iframe, embed) ────────────────────────
+
+  "frame-title": {
+    title: "Vložený obsah (iframe) nemá popis",
+    description:
+      "Na stránce je vložený obsah (mapa, video, chatovací okno…), ale nemá popis. Nevidomý uživatel neví, co se v rámečku zobrazuje.",
+    fix: "Přidejte popis k vloženému obsahu (atribut title na iframe).",
+  },
+  "frame-focusable-content": {
+    title: "Interaktivní vložený obsah nemá popis",
+    description:
+      "Vložený obsah (iframe) obsahuje klikací prvky, ale nemá popis. Uživatel čtečky neví, s čím interaguje.",
+    fix: "Přidejte popis k vloženému obsahu.",
+  },
+  "frame-title-unique": {
+    title: "Vložené obsahy mají stejný popis",
+    description:
+      "Na stránce je víc vložených obsahů (iframe) se stejným popisem. Uživatel je od sebe nerozliší.",
+    fix: "Dejte každému vloženému obsahu jedinečný popis.",
+  },
+
+  // ── Obrázková mapa a objekty ─────────────────────────────
+
+  "object-alt": {
+    title: "Vložený objekt nemá popis",
+    description:
+      "Na stránce je vložený objekt (Flash, PDF, apod.) bez textového popisu. Nevidomý uživatel neví, co obsahuje.",
+    fix: "Přidejte textový popis k vloženému objektu.",
+  },
+  "area-alt": {
+    title: "Klikací oblast v obrázkové mapě nemá popis",
+    description:
+      "Obrázková mapa má klikací oblast bez popisu. Uživatel čtečky neví, kam odkaz vede.",
+    fix: "Přidejte popis ke klikací oblasti.",
   },
 };
 
-export function getCzechTranslation(ruleId: string): RuleTranslation | null {
-  return translations[ruleId] || null;
+/**
+ * Vrátí český překlad pravidla axe-core.
+ * Pokud překlad neexistuje, vrátí generický český fallback (nikdy angličtinu).
+ */
+export function getCzechTranslation(
+  ruleId: string,
+  fallbackTitle?: string,
+  fallbackDescription?: string
+): RuleTranslation {
+  if (translations[ruleId]) {
+    return translations[ruleId];
+  }
+
+  // Generický český fallback — nikdy nezobrazovat angličtinu
+  return {
+    title: humanizeRuleId(ruleId),
+    description:
+      fallbackDescription
+        ? `Toto pravidlo přístupnosti nebylo splněno. Podrobnosti v anglické dokumentaci níže.`
+        : "Automatická kontrola odhalila problém s přístupností na tomto prvku stránky.",
+    fix: "Předejte tuto informaci svému webovému vývojáři — v odkazu níže najde technické detaily a návod na opravu.",
+  };
+}
+
+/** Převede rule ID na čitelný český název, např. "color-contrast" → "Pravidlo: Color contrast" */
+function humanizeRuleId(ruleId: string): string {
+  const name = ruleId
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return `Problém přístupnosti: ${name}`;
 }
 
 export function getImpactLabel(impact: string): string {

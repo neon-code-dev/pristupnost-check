@@ -39,6 +39,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://pristupnost-check.vercel.app",
   },
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -49,7 +52,6 @@ export default function RootLayout({
   return (
     <html lang="cs">
       <head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
