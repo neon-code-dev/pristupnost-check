@@ -168,7 +168,7 @@ const translations: Record<string, RuleTranslation> = {
     title: "Nedostatečný barevný kontrast textu",
     description:
       "Text na stránce je špatně čitelný — barva písma je příliš podobná barvě pozadí. Lidé se slabým zrakem, starší uživatelé nebo kdokoli na slunci na mobilu text nepřečte.",
-    fix: "Ztmavěte barvu textu nebo zesvětlete pozadí. Minimální kontrastní poměr je 4.5:1 pro běžný text. Ověřte nástrojem WebAIM Contrast Checker.",
+    fix: "Ztmavte barvu textu nebo zesvětlete pozadí. Minimální kontrastní poměr je 4.5:1 pro běžný text. Ověřte nástrojem WebAIM Contrast Checker.",
   },
   "color-contrast-enhanced": {
     title: "Barevný kontrast textu nesplňuje vyšší standard",

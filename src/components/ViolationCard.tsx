@@ -91,9 +91,6 @@ export default function ViolationCard({ issue, pageUrl }: { issue: ScanIssue; pa
                       className="w-full object-contain"
                       loading="lazy"
                     />
-                    <p className="px-3 py-2 text-xs text-slate-500 border-t border-slate-100">
-                      Červeně zvýrazněný prvek na stránce
-                    </p>
                   </div>
                 ))}
               </div>

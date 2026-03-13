@@ -124,8 +124,8 @@ async function captureScreenshots(
         await page.evaluate((s: string) => {
           const e = document.querySelector(s) as HTMLElement | null;
           if (e) {
-            e.style.setProperty("outline", "3px solid #ef4444", "important");
-            e.style.setProperty("outline-offset", "2px", "important");
+            e.style.setProperty("outline", "4px solid #dc2626", "important");
+            e.style.setProperty("outline-offset", "3px", "important");
           }
         }, selector);
 
