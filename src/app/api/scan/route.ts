@@ -24,7 +24,6 @@ function jsonResponse(
   cors: Record<string, string>
 ): NextResponse {
   const res = NextResponse.json(data, { status });
-  res.headers.set("X-Pristupnost-Version", "2");
   for (const [key, value] of Object.entries(cors)) {
     res.headers.set(key, value);
   }
