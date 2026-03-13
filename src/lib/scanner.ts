@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
+import chromium from "@sparticuz/chromium-min";
 import axe from "axe-core";
 import { getCzechTranslation } from "./translations";
 
@@ -50,6 +50,8 @@ interface AxeResults {
 }
 
 const PAGE_TIMEOUT_MS = 20000;
+const CHROMIUM_PACK_URL =
+  "https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar";
 
 function normalizeUrl(input: string): string {
   let url = input.trim();
@@ -97,7 +99,7 @@ export async function scanUrl(inputUrl: string): Promise<ScanResult> {
       headless: "shell",
     }),
     defaultViewport: { width: 1366, height: 768 },
-    executablePath: await chromium.executablePath(),
+    executablePath: await chromium.executablePath(CHROMIUM_PACK_URL),
     headless: "shell",
   });
 
