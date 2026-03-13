@@ -2,31 +2,34 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kontrola přístupnosti webu — bezplatný WCAG skener pro e-shopy",
+  title: "Kontrola přístupnosti e-shopu zdarma | WCAG 2.1 AA česky",
   description:
-    "Zkontrolujte přístupnost svého e-shopu zdarma. Automatický sken podle WCAG 2.1 AA s výsledky v češtině. Od června 2025 platí zákon 424/2023 Sb. — pokuta až 10 mil. Kč.",
+    "Zkontrolujte přístupnost svého e-shopu podle WCAG 2.1 AA zdarma. Výsledky česky s návody na opravu. Zákon 424/2023 Sb. platí — vyhněte se pokutám ČOI až 10 mil. Kč.",
   keywords: [
-    "kontrola přístupnosti",
-    "přístupnost webu",
-    "WCAG",
+    "kontrola přístupnosti webu",
+    "test přístupnosti e-shopu",
     "přístupnost e-shopu",
+    "WCAG 2.1 AA",
+    "audit přístupnosti webu",
     "zákon 424/2023",
     "European Accessibility Act",
     "EAA",
-    "WCAG 2.1",
-    "ČOI přístupnost",
+    "bezbariérový e-shop",
     "bezbariérový web",
-    "audit přístupnosti",
-    "accessibility checker",
+    "ČOI přístupnost",
+    "validator přístupnosti",
+    "přístupnost Shoptet",
+    "pokuta nepřístupný e-shop",
+    "test přístupnosti webu zdarma česky",
   ],
-  authors: [{ name: "Přístupnost Check" }],
+  authors: [{ name: "PřístupnostCheck" }],
   openGraph: {
-    title: "Kontrola přístupnosti webu — bezplatný WCAG skener",
+    title: "Kontrola přístupnosti e-shopu zdarma | WCAG 2.1",
     description:
-      "Zkontrolujte přístupnost svého e-shopu zdarma. Automatický sken podle WCAG 2.1 AA s výsledky v češtině.",
+      "Splňuje váš e-shop zákon o přístupnosti? Bezplatný test podle WCAG 2.1 AA s výsledky v češtině. Pokuta až 10 mil. Kč.",
     type: "website",
     locale: "cs_CZ",
-    siteName: "Přístupnost Check",
+    siteName: "PřístupnostCheck",
   },
   robots: {
     index: true,
@@ -46,6 +49,27 @@ export default function RootLayout({
     <html lang="cs">
       <head>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✓</text></svg>" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              name: "PřístupnostCheck",
+              description:
+                "Bezplatný online test přístupnosti webových stránek a e-shopů podle standardu WCAG 2.1 AA. Výsledky v češtině.",
+              url: "https://pristupnost-check.vercel.app",
+              applicationCategory: "DeveloperApplication",
+              operatingSystem: "Web",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "CZK",
+              },
+              inLanguage: "cs",
+            }),
+          }}
+        />
       </head>
       <body className="min-h-screen">
         {children}

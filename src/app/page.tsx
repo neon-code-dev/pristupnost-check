@@ -95,15 +95,15 @@ export default function Home() {
                 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-950 leading-[1.1] tracking-tight mb-6"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                Kontrola přístupnosti
+                Splňuje váš e-shop
                 <br />
-                <span className="text-indigo-700">vašeho webu</span>
+                <span className="text-indigo-700">zákon o přístupnosti?</span>
               </h1>
 
               <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-10 max-w-2xl">
-                Zjistěte zda váš e-shop splňuje požadavky na přístupnost podle{" "}
+                Bezplatná kontrola přístupnosti e-shopu podle{" "}
                 <strong className="text-slate-800">WCAG 2.1 AA</strong>.
-                Výsledky v češtině s konkrétními návody na opravu. Zdarma.
+                Výsledky v češtině s konkrétními návody co opravit. Ověřte si svůj bezbariérový web za pár sekund.
               </p>
 
               <ScanForm />
