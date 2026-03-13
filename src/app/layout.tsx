@@ -39,9 +39,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://pristupnost-check.vercel.app",
   },
-  icons: {
-    icon: "/favicon.svg",
-  },
 };
 
 export default function RootLayout({
