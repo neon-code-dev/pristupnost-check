@@ -105,7 +105,7 @@ export default function Home() {
       />
 
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-slate-200 bg-white sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-indigo-700 flex items-center justify-center">
@@ -129,11 +129,8 @@ export default function Home() {
 
       {/* Hero */}
       <main className="flex-1">
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 geo-pattern" />
-          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-30 -translate-y-1/2 translate-x-1/3" />
-
-          <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-20 sm:pb-28">
+        <section>
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-20 sm:pb-28">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-semibold mb-6 tracking-wide uppercase">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
@@ -577,9 +574,8 @@ export default function Home() {
         </section>
 
         {/* CTA repeat */}
-        <section className="py-16 sm:py-20 bg-indigo-700 relative overflow-hidden">
-          <div className="absolute inset-0 geo-pattern opacity-10" />
-          <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+        <section className="py-16 sm:py-20 bg-indigo-700">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
             <h2
               className="text-2xl sm:text-3xl font-black text-white mb-4"
               style={{ fontFamily: "var(--font-display)" }}
